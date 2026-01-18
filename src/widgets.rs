@@ -223,6 +223,234 @@ fn build_animated_route_content(
     }
 }
 
+#[cfg(feature = "transition")]
+/// Build content with EXIT animation (old content leaving)
+fn build_exit_animated_content(
+    cx: &mut App,
+    window: &mut Window,
+    builder: Option<&crate::route::RouteBuilder>,
+    params: &crate::RouteParams,
+    animation_id: SharedString,
+    transition: &Transition,
+    duration_ms: u64,
+) -> AnyElement {
+    let content = if let Some(builder) = builder {
+        builder(cx, params)
+    } else {
+        div().child("No route matched").into_any_element()
+    };
+
+    if duration_ms == 0 {
+        return div().child(content).into_any_element();
+    }
+
+    match transition {
+        Transition::Fade { .. } => div()
+            .absolute()
+            .w_full()
+            .h_full()
+            .child(content)
+            .with_animation(
+                animation_id,
+                Animation::new(Duration::from_millis(duration_ms)),
+                |this, delta| {
+                    // Reverse: start at 1.0, end at 0.0
+                    let opacity = 1.0 - delta.clamp(0.0, 1.0);
+                    this.opacity(opacity)
+                },
+            )
+            .into_any_element(),
+
+        Transition::Slide { direction, .. } => match direction {
+            SlideDirection::Right => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                -1.0, // Exit left
+                |div, offset_fraction| div.left(relative(offset_fraction)),
+                "Exit Left",
+            )
+            .into_any_element(),
+            SlideDirection::Left => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                1.0, // Exit right
+                |div, offset_fraction| div.left(relative(offset_fraction)),
+                "Exit Right",
+            )
+            .into_any_element(),
+            SlideDirection::Down => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                -1.0, // Exit up
+                |div, offset_fraction| div.top(relative(offset_fraction)),
+                "Exit Up",
+            )
+            .into_any_element(),
+            SlideDirection::Up => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                1.0, // Exit down
+                |div, offset_fraction| div.top(relative(offset_fraction)),
+                "Exit Down",
+            )
+            .into_any_element(),
+        },
+
+        Transition::Scale { from, to, .. } => {
+            let from = *from;
+            let to = *to;
+            let viewport_size = window.viewport_size();
+            let viewport_width = viewport_size.width;
+            let viewport_height = viewport_size.height;
+
+            div()
+                .absolute()
+                .w_full()
+                .h_full()
+                .flex()
+                .items_center()
+                .justify_center()
+                .child(content)
+                .with_animation(
+                    animation_id,
+                    Animation::new(Duration::from_millis(duration_ms)),
+                    move |this, delta| {
+                        let delta = delta.clamp(0.0, 1.0);
+                        // Reverse scale: from 'to' to 'from'
+                        let scale = to - (to - from) * delta;
+                        let width = viewport_width * scale;
+                        let height = viewport_height * scale;
+                        this.w(width).h(height).opacity(1.0 - delta)
+                    },
+                )
+                .into_any_element()
+        }
+
+        _ => div()
+            .absolute()
+            .w_full()
+            .h_full()
+            .child(content)
+            .into_any_element(),
+    }
+}
+
+#[cfg(feature = "transition")]
+/// Build content with ENTER animation (new content arriving)
+fn build_enter_animated_content(
+    cx: &mut App,
+    window: &mut Window,
+    builder: Option<&crate::route::RouteBuilder>,
+    params: &crate::RouteParams,
+    animation_id: SharedString,
+    transition: &Transition,
+    duration_ms: u64,
+) -> AnyElement {
+    let content = if let Some(builder) = builder {
+        builder(cx, params)
+    } else {
+        div().child("No route matched").into_any_element()
+    };
+
+    if duration_ms == 0 {
+        return div().child(content).into_any_element();
+    }
+
+    match transition {
+        Transition::Fade { .. } => div()
+            .absolute()
+            .w_full()
+            .h_full()
+            .child(content)
+            .opacity(0.0)
+            .with_animation(
+                animation_id,
+                Animation::new(Duration::from_millis(duration_ms)),
+                |this, delta| this.opacity(delta.clamp(0.0, 1.0)),
+            )
+            .into_any_element(),
+
+        Transition::Slide { direction, .. } => match direction {
+            SlideDirection::Left => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                -1.0,
+                |div, offset_fraction| div.left(relative(offset_fraction)),
+                "Enter Left",
+            )
+            .into_any_element(),
+            SlideDirection::Right => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                1.0,
+                |div, offset_fraction| div.left(relative(offset_fraction)),
+                "Enter Right",
+            )
+            .into_any_element(),
+            SlideDirection::Up => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                -1.0,
+                |div, offset_fraction| div.top(relative(offset_fraction)),
+                "Enter Up",
+            )
+            .into_any_element(),
+            SlideDirection::Down => create_slide_wrapper(
+                content,
+                animation_id,
+                duration_ms,
+                1.0,
+                |div, offset_fraction| div.top(relative(offset_fraction)),
+                "Enter Down",
+            )
+            .into_any_element(),
+        },
+
+        Transition::Scale { from, to, .. } => {
+            let from = *from;
+            let to = *to;
+            let viewport_size = window.viewport_size();
+            let viewport_width = viewport_size.width;
+            let viewport_height = viewport_size.height;
+
+            div()
+                .absolute()
+                .w_full()
+                .h_full()
+                .flex()
+                .items_center()
+                .justify_center()
+                .child(content)
+                .with_animation(
+                    animation_id,
+                    Animation::new(Duration::from_millis(duration_ms)),
+                    move |this, delta| {
+                        let delta = delta.clamp(0.0, 1.0);
+                        let scale = from + (to - from) * delta;
+                        let width = viewport_width * scale;
+                        let height = viewport_height * scale;
+                        this.w(width).h(height).opacity(delta)
+                    },
+                )
+                .into_any_element()
+        }
+
+        _ => div()
+            .absolute()
+            .w_full()
+            .h_full()
+            .child(content)
+            .into_any_element(),
+    }
+}
+
 #[cfg(not(feature = "transition"))]
 /// Helper function to build route content without animation (transition feature disabled)
 fn build_animated_route_content(
@@ -316,10 +544,41 @@ impl Default for RouterOutlet {
 use gpui::{Context, Render};
 
 /// State for RouterOutlet animation tracking
-#[derive(Clone, Debug, Default)]
+#[derive(Clone)]
 struct OutletState {
     current_path: String,
     animation_counter: u32,
+    // Current route data (will become previous on next transition)
+    current_params: crate::RouteParams,
+    current_builder: Option<crate::route::RouteBuilder>,
+    #[cfg(feature = "transition")]
+    current_transition: crate::transition::Transition,
+    // Previous route info for exit animation
+    previous_route: Option<PreviousRoute>,
+}
+
+#[derive(Clone)]
+struct PreviousRoute {
+    path: String,
+    params: crate::RouteParams,
+    builder: Option<crate::route::RouteBuilder>,
+    #[cfg(feature = "transition")]
+    transition: crate::transition::Transition,
+    animation_counter: u32,
+}
+
+impl Default for OutletState {
+    fn default() -> Self {
+        Self {
+            current_path: String::new(),
+            animation_counter: 0,
+            current_params: crate::RouteParams::new(),
+            current_builder: None,
+            #[cfg(feature = "transition")]
+            current_transition: crate::transition::Transition::None,
+            previous_route: None,
+        }
+    }
 }
 
 impl Render for RouterOutlet {
@@ -330,9 +589,13 @@ impl Render for RouterOutlet {
         let state_key = SharedString::from(format!("outlet_{:?}", self.name));
         let state = window.use_keyed_state(state_key.clone(), cx, |_, _| OutletState::default());
 
-        let (prev_path, animation_counter) = {
+        let (prev_path, animation_counter, prev_route_data) = {
             let guard = state.read(cx);
-            (guard.current_path.clone(), guard.animation_counter)
+            (
+                guard.current_path.clone(),
+                guard.animation_counter,
+                guard.previous_route.clone(),
+            )
         };
 
         // Get current router info
@@ -433,9 +696,27 @@ impl Render for RouterOutlet {
                 animation_counter
             };
 
-            // Update state
+            // Update state and save previous route for exit animation
             state.update(cx, |s, _| {
+                // Save CURRENT (old) route data as previous (if not initial)
+                if !is_initial {
+                    s.previous_route = Some(PreviousRoute {
+                        path: s.current_path.clone(),
+                        params: s.current_params.clone(),
+                        builder: s.current_builder.clone(),
+                        #[cfg(feature = "transition")]
+                        transition: s.current_transition.clone(),
+                        animation_counter: s.animation_counter,
+                    });
+                }
+                // Update state with NEW route data
                 s.current_path = router_path.clone();
+                s.current_params = route_params.clone();
+                s.current_builder = builder_opt.clone();
+                #[cfg(feature = "transition")]
+                {
+                    s.current_transition = route_transition.clone();
+                }
                 s.animation_counter = new_counter;
             });
 
@@ -457,10 +738,6 @@ impl Render for RouterOutlet {
                 Transition::Custom(_) => 300,
             };
 
-            // Create animation ID based on counter - each route change gets fresh animation
-            let animation_id =
-                SharedString::from(format!("outlet_anim_{:?}_{}", self.name, animation_counter));
-
             debug_log!(
                 "Rendering route '{}' with animation_counter={}, duration={}ms",
                 router_path,
@@ -468,17 +745,54 @@ impl Render for RouterOutlet {
                 duration_ms
             );
 
-            // Build animated content using helper function (similar to gpui_animations_test.rs)
-            // This function creates content AND applies animation in one go
-            build_animated_route_content(
-                cx,
-                window,
-                builder_opt.as_ref(),
-                &route_params,
-                animation_id,
-                &route_transition,
-                duration_ms,
-            )
+            // Get previous route info for exit animation
+            let previous_route = state.read(cx).previous_route.clone();
+
+            // Build container with both old (exiting) and new (entering) content
+            div()
+                .relative()
+                .w_full()
+                .h_full()
+                .child(
+                    // Stack both elements
+                    div()
+                        .absolute()
+                        .w_full()
+                        .h_full()
+                        .children(previous_route.map(|prev| {
+                            // Old content with EXIT animation
+                            let exit_animation_id = SharedString::from(format!(
+                                "outlet_exit_{:?}_{}",
+                                self.name, prev.animation_counter
+                            ));
+                            build_exit_animated_content(
+                                cx,
+                                window,
+                                prev.builder.as_ref(),
+                                &prev.params,
+                                exit_animation_id,
+                                &prev.transition,
+                                duration_ms,
+                            )
+                        }))
+                        .child({
+                            // New content with ENTER animation
+                            let enter_animation_id = SharedString::from(format!(
+                                "outlet_enter_{:?}_{}",
+                                self.name, animation_counter
+                            ));
+                            build_enter_animated_content(
+                                cx,
+                                window,
+                                builder_opt.as_ref(),
+                                &route_params,
+                                enter_animation_id,
+                                &route_transition,
+                                duration_ms,
+                            )
+                        }),
+                )
+                .into_any_element()
         }
 
         #[cfg(not(feature = "transition"))]

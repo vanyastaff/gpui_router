@@ -313,7 +313,7 @@ impl Render for RouterOutlet {
                         if let Some(builder) = prev.builder.as_ref() {
                             builder(cx, &prev.params)
                         } else {
-                            div().child("No route matched").into_any_element()
+                            not_found_page().into_any_element()
                         }
                     });
 
@@ -321,7 +321,7 @@ impl Render for RouterOutlet {
                     let new_content = if let Some(builder) = builder_opt.as_ref() {
                         builder(cx, &route_params)
                     } else {
-                        div().child("No route matched").into_any_element()
+                        not_found_page().into_any_element()
                     };
 
                     // Create animated container that holds BOTH elements side-by-side
@@ -451,7 +451,7 @@ impl Render for RouterOutlet {
                         if let Some(builder) = prev.builder.as_ref() {
                             builder(cx, &prev.params)
                         } else {
-                            div().child("No route matched").into_any_element()
+                            not_found_page().into_any_element()
                         }
                     });
 
@@ -459,7 +459,7 @@ impl Render for RouterOutlet {
                     let new_content = if let Some(builder) = builder_opt.as_ref() {
                         builder(cx, &route_params)
                     } else {
-                        div().child("No route matched").into_any_element()
+                        not_found_page().into_any_element()
                     };
 
                     div()
@@ -515,7 +515,7 @@ impl Render for RouterOutlet {
                     let new_content = if let Some(builder) = builder_opt.as_ref() {
                         builder(cx, &route_params)
                     } else {
-                        div().child("No route matched").into_any_element()
+                        not_found_page().into_any_element()
                     };
 
                     div()
@@ -865,6 +865,7 @@ impl RouterLink {
             MouseButton::Left,
             cx.listener(move |_view, _event, _window, cx| {
                 Navigator::push(cx, path.to_string());
+                cx.notify();
             }),
         );
 
@@ -908,7 +909,309 @@ pub fn router_link<V: 'static>(
             MouseButton::Left,
             cx.listener(move |_view, _event, _window, cx| {
                 Navigator::push(cx, path_str.to_string());
+                cx.notify();
             }),
+        )
+}
+
+// ============================================================================
+// Default Pages System
+// ============================================================================
+
+/// Configuration for default router pages (404, loading, error, etc.)
+pub struct DefaultPages {
+    /// Custom 404 not found page builder
+    pub not_found: Option<Box<dyn Fn() -> AnyElement + Send + Sync>>,
+    /// Custom loading page builder
+    pub loading: Option<Box<dyn Fn() -> AnyElement + Send + Sync>>,
+    /// Custom error page builder
+    pub error: Option<Box<dyn Fn(&str) -> AnyElement + Send + Sync>>,
+}
+
+impl DefaultPages {
+    /// Create new default pages configuration with built-in defaults
+    pub fn new() -> Self {
+        Self {
+            not_found: None,
+            loading: None,
+            error: None,
+        }
+    }
+
+    /// Set custom 404 not found page
+    pub fn with_not_found<F>(mut self, builder: F) -> Self
+    where
+        F: Fn() -> AnyElement + Send + Sync + 'static,
+    {
+        self.not_found = Some(Box::new(builder));
+        self
+    }
+
+    /// Set custom loading page
+    pub fn with_loading<F>(mut self, builder: F) -> Self
+    where
+        F: Fn() -> AnyElement + Send + Sync + 'static,
+    {
+        self.loading = Some(Box::new(builder));
+        self
+    }
+
+    /// Set custom error page
+    pub fn with_error<F>(mut self, builder: F) -> Self
+    where
+        F: Fn(&str) -> AnyElement + Send + Sync + 'static,
+    {
+        self.error = Some(Box::new(builder));
+        self
+    }
+
+    /// Render 404 not found page (custom or default)
+    pub fn render_not_found(&self) -> AnyElement {
+        if let Some(builder) = &self.not_found {
+            builder()
+        } else {
+            default_not_found_page().into_any_element()
+        }
+    }
+
+    /// Render loading page (custom or default)
+    pub fn render_loading(&self) -> AnyElement {
+        if let Some(builder) = &self.loading {
+            builder()
+        } else {
+            default_loading_page().into_any_element()
+        }
+    }
+
+    /// Render error page (custom or default)
+    pub fn render_error(&self, message: &str) -> AnyElement {
+        if let Some(builder) = &self.error {
+            builder(message)
+        } else {
+            default_error_page(message).into_any_element()
+        }
+    }
+}
+
+impl Default for DefaultPages {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+// ============================================================================
+// Built-in Default Pages
+// ============================================================================
+
+/// Default 404 Not Found page
+fn not_found_page() -> impl IntoElement {
+    // For now, use the static default
+    // In the future, this could check a global DefaultPages config
+    default_not_found_page()
+}
+
+/// Built-in minimalist 404 page
+fn default_not_found_page() -> impl IntoElement {
+    use gpui::{div, relative, rgb, ParentElement, Styled};
+
+    div()
+        .flex()
+        .flex_col()
+        .items_center()
+        .justify_center()
+        .size_full()
+        .bg(rgb(0x1e1e1e))
+        .p_8()
+        .gap_6()
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .justify_center()
+                .w(px(140.))
+                .h(px(140.))
+                .rounded(px(24.))
+                .bg(rgb(0xf44336))
+                .shadow_lg()
+                .child(
+                    div()
+                        .text_color(rgb(0xffffff))
+                        .text_size(px(64.))
+                        .child("404"),
+                ),
+        )
+        .child(
+            div()
+                .text_3xl()
+                .font_weight(FontWeight::BOLD)
+                .text_color(rgb(0xffffff))
+                .child("Page Not Found"),
+        )
+        .child(
+            div()
+                .text_base()
+                .text_color(rgb(0xcccccc))
+                .text_center()
+                .max_w(px(500.))
+                .line_height(relative(1.6))
+                .child("The page you're looking for doesn't exist or has been moved."),
+        )
+        .child(
+            div()
+                .mt_4()
+                .p_6()
+                .bg(rgb(0x252526))
+                .rounded(px(12.))
+                .border_1()
+                .border_color(rgb(0x3e3e3e))
+                .max_w(px(600.))
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_3()
+                        .child(
+                            div()
+                                .text_sm()
+                                .font_weight(FontWeight::BOLD)
+                                .text_color(rgb(0xf44336))
+                                .mb_2()
+                                .child("What happened?"),
+                        )
+                        .child(not_found_item("•", "The route doesn't exist in the router"))
+                        .child(not_found_item("•", "The URL might be mistyped"))
+                        .child(not_found_item("•", "The page may have been removed")),
+                ),
+        )
+}
+
+fn not_found_item(bullet: &str, text: &str) -> impl IntoElement {
+    use gpui::{div, rgb, ParentElement, Styled};
+
+    div()
+        .flex()
+        .items_start()
+        .gap_3()
+        .child(
+            div()
+                .text_sm()
+                .text_color(rgb(0xf44336))
+                .child(bullet.to_string()),
+        )
+        .child(
+            div()
+                .text_sm()
+                .text_color(rgb(0xcccccc))
+                .line_height(relative(1.5))
+                .child(text.to_string()),
+        )
+}
+
+/// Built-in minimalist loading page
+fn default_loading_page() -> impl IntoElement {
+    use gpui::{div, rgb, ParentElement, Styled};
+
+    div()
+        .flex()
+        .flex_col()
+        .items_center()
+        .justify_center()
+        .size_full()
+        .bg(rgb(0x1e1e1e))
+        .gap_4()
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .justify_center()
+                .w(px(80.))
+                .h(px(80.))
+                .rounded(px(16.))
+                .bg(rgb(0x2196f3))
+                .shadow_lg()
+                .child(
+                    div()
+                        .text_color(rgb(0xffffff))
+                        .text_size(px(36.))
+                        .child("⏳"),
+                ),
+        )
+        .child(
+            div()
+                .text_xl()
+                .font_weight(FontWeight::MEDIUM)
+                .text_color(rgb(0xffffff))
+                .child("Loading..."),
+        )
+        .child(
+            div()
+                .text_sm()
+                .text_color(rgb(0x888888))
+                .child("Please wait"),
+        )
+}
+
+/// Built-in minimalist error page
+fn default_error_page(message: &str) -> impl IntoElement {
+    use gpui::{div, relative, rgb, ParentElement, Styled};
+
+    div()
+        .flex()
+        .flex_col()
+        .items_center()
+        .justify_center()
+        .size_full()
+        .bg(rgb(0x1e1e1e))
+        .p_8()
+        .gap_6()
+        .child(
+            div()
+                .flex()
+                .items_center()
+                .justify_center()
+                .w(px(120.))
+                .h(px(120.))
+                .rounded(px(20.))
+                .bg(rgb(0xff9800))
+                .shadow_lg()
+                .child(
+                    div()
+                        .text_color(rgb(0xffffff))
+                        .text_size(px(48.))
+                        .child("⚠️"),
+                ),
+        )
+        .child(
+            div()
+                .text_2xl()
+                .font_weight(FontWeight::BOLD)
+                .text_color(rgb(0xffffff))
+                .child("Something Went Wrong"),
+        )
+        .child(
+            div()
+                .text_base()
+                .text_color(rgb(0xcccccc))
+                .text_center()
+                .max_w(px(500.))
+                .line_height(relative(1.6))
+                .child(message.to_string()),
+        )
+        .child(
+            div()
+                .mt_2()
+                .px_6()
+                .py_3()
+                .bg(rgb(0x252526))
+                .rounded(px(8.))
+                .border_1()
+                .border_color(rgb(0x3e3e3e))
+                .child(
+                    div()
+                        .text_sm()
+                        .text_color(rgb(0x888888))
+                        .child("Try refreshing the page or contact support"),
+                ),
         )
 }
 

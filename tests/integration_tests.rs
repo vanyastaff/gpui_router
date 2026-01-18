@@ -284,7 +284,7 @@ fn test_transition_duration() {
         Duration::from_millis(400)
     );
     assert_eq!(
-        Transition::zoom_in(500).duration(),
+        Transition::slide_up(500).duration(),
         Duration::from_millis(500)
     );
 }
@@ -479,6 +479,82 @@ fn test_route_cache_stats() {
     cache.clear();
     assert_eq!(cache.stats().invalidations, 1);
     assert_eq!(cache.parent_cache_size(), 0);
+}
+
+// ============================================================================
+// Error Handlers Tests
+// ============================================================================
+
+#[gpui::test]
+async fn test_not_found_handler_rendering(cx: &mut TestAppContext) {
+    let handlers = ErrorHandlers::new().on_not_found(|_cx, path| {
+        div()
+            .child(format!("Custom 404: Page '{}' not found", path))
+            .into_any_element()
+    });
+
+    // Test that the handler can render a not found page
+    let element = cx.update(|cx| handlers.render_not_found(cx, "/non-existent-page"));
+    assert!(element.is_some());
+}
+
+#[gpui::test]
+async fn test_error_handler_rendering(cx: &mut TestAppContext) {
+    use gpui_router::NavigationError;
+
+    let handlers = ErrorHandlers::new()
+        .on_not_found(|_cx, path| {
+            div()
+                .child(format!("404: {} not found", path))
+                .into_any_element()
+        })
+        .on_error(|_cx, error| {
+            div()
+                .child(format!("Error occurred: {}", error))
+                .into_any_element()
+        });
+
+    // Test not found handler
+    let not_found_element = cx.update(|cx| handlers.render_not_found(cx, "/invalid"));
+    assert!(not_found_element.is_some());
+
+    // Test error handler
+    let error = NavigationError::RouteNotFound {
+        path: "/test".to_string(),
+    };
+    let error_element = cx.update(|cx| handlers.render_error(cx, &error));
+    assert!(error_element.is_some());
+}
+
+#[gpui::test]
+async fn test_custom_error_pages(cx: &mut TestAppContext) {
+    use gpui_router::NavigationError;
+
+    let handlers = ErrorHandlers::new()
+        .on_not_found(|_cx, path| {
+            div()
+                .child("Error 404")
+                .child(div().child(format!("The page '{}' could not be found", path)))
+                .child(div().child("Go back to home"))
+                .into_any_element()
+        })
+        .on_error(|_cx, error| {
+            div()
+                .child("Application Error")
+                .child(div().child(format!("Details: {}", error)))
+                .into_any_element()
+        });
+
+    // Test 404 page with complex layout
+    let element = cx.update(|cx| handlers.render_not_found(cx, "/does-not-exist"));
+    assert!(element.is_some());
+
+    // Test error page with navigation error
+    let error = NavigationError::GuardBlocked {
+        reason: "Not authenticated".to_string(),
+    };
+    let element = cx.update(|cx| handlers.render_error(cx, &error));
+    assert!(element.is_some());
 }
 
 // ============================================================================

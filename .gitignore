@@ -1,0 +1,51 @@
+# Build artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.zed/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+
+# Debug files
+*.log
+*.dmp
+
+# Coverage reports
+*.gcno
+*.gcda
+*.lcov
+coverage/
+tarpaulin-report.html
+
+# Profiling
+*.profdata
+*.profraw
+flamegraph.svg
+perf.data
+perf.data.old
+
+# Benchmarks output
+criterion/
+
+# Documentation output (regenerated)
+/doc/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor project files
+*.sublime-project
+*.sublime-workspace

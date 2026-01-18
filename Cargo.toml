@@ -1,0 +1,114 @@
+[package]
+name = "gpui_router"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Declarative router for GPUI with transitions, nested routing, guards, and middleware"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+documentation = "https://docs.rs/gpui_router"
+homepage = "https://github.com/nicholasoxford/gpui_router"
+repository = "https://github.com/nicholasoxford/gpui_router"
+keywords = ["gpui", "router", "navigation", "declarative", "ui"]
+categories = ["gui", "development-tools"]
+authors = ["gpui_router contributors"]
+exclude = [
+    ".github/",
+    ".idea/",
+    ".claude/",
+    "target/",
+    "*.md",
+    "!README.md",
+]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[lints.rust]
+unsafe_code = "forbid"
+rust_2018_idioms = { level = "warn", priority = -1 }
+
+[lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+cargo = { level = "warn", priority = -1 }
+# Allow some pedantic lints that are too strict for builder pattern APIs
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+return_self_not_must_use = "allow"
+doc_markdown = "allow"
+missing_fields_in_debug = "allow"
+redundant_closure_for_method_calls = "allow"
+inefficient_to_string = "allow"
+unnecessary_literal_bound = "allow"
+# Allow dependency-related warnings (we can't control gpui's dependencies)
+multiple_crate_versions = "allow"
+# Allow some nursery lints that produce false positives or are too strict
+missing_const_for_fn = "allow"
+option_if_let_else = "allow"
+use_self = "allow"
+derive_partial_eq_without_eq = "allow"
+significant_drop_tightening = "allow"
+# Allow format string interpolation style (both are valid)
+uninlined_format_args = "allow"
+# Allow minor optimization suggestions
+assigning_clones = "allow"
+cast_precision_loss = "allow"
+match_same_arms = "allow"
+needless_continue = "allow"
+suboptimal_flops = "allow"
+# Allow code style preferences
+redundant_clone = "allow"
+needless_pass_by_value = "allow"
+wildcard_imports = "allow"
+single_match_else = "allow"
+too_many_lines = "allow"
+needless_lifetimes = "allow"
+unused_peekable = "allow"
+needless_bool = "allow"
+branches_sharing_code = "allow"
+map_unwrap_or = "allow"
+needless_borrows_for_generic_args = "allow"
+# Allow remaining minor warnings
+no_effect_underscore_binding = "allow"
+nonminimal_bool = "allow"
+needless_doctest_main = "allow"
+only_used_in_recursion = "allow"
+# Allow API compatibility patterns
+needless_pass_by_ref_mut = "allow"
+# Allow unreadable literals for hex colors (0xRRGGBB is standard)
+unreadable_literal = "allow"
+
+[dependencies]
+gpui = "0.2"
+
+# Optional dependencies
+lru = { version = "0.16", optional = true }
+log = { version = "0.4", optional = true }
+tracing = { version = "0.1", optional = true }
+
+[features]
+default = ["log", "guard", "middleware", "cache", "transition"]
+# Core features
+guard = []
+middleware = []
+transition = []
+# Optional LRU cache for route resolution
+cache = ["dep:lru"]
+# Logging backend - choose one (mutually exclusive)
+log = ["dep:log"]
+tracing = ["dep:tracing"]
+
+[dev-dependencies]
+gpui = { version = "0.2", features = ["test-support"] }
+env_logger = "0.11"
+tokio = { version = "1", features = ["rt", "macros"] }
+pollster = "0.4"
+
+[[example]]
+name = "transition_demo"
+path = "examples/transition_demo.rs"

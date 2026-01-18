@@ -1,0 +1,442 @@
+//! Route parameter extraction and query string parsing
+//!
+//! This module provides types for working with URL parameters extracted from route
+//! patterns (like `:id`) and query strings (like `?page=1&sort=name`).
+
+use std::collections::HashMap;
+
+/// Route parameters extracted from path segments
+///
+/// # Example
+///
+/// ```
+/// use gpui_router::RouteParams;
+///
+/// // Route pattern: /users/:id
+/// // Matched path: /users/123
+/// let mut params = RouteParams::new();
+/// params.insert("id".to_string(), "123".to_string());
+///
+/// assert_eq!(params.get("id"), Some(&"123".to_string()));
+/// assert_eq!(params.get_as::<i32>("id"), Some(123));
+/// ```
+#[derive(Debug, Clone, Default)]
+pub struct RouteParams {
+    params: HashMap<String, String>,
+}
+
+impl RouteParams {
+    /// Create new empty route params
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Create from hashmap
+    pub fn from_map(params: HashMap<String, String>) -> Self {
+        Self { params }
+    }
+
+    /// Get a parameter value as a string
+    pub fn get(&self, key: &str) -> Option<&String> {
+        self.params.get(key)
+    }
+
+    /// Get a parameter and parse it as a specific type
+    ///
+    /// Returns `None` if the parameter doesn't exist or cannot be parsed.
+    pub fn get_as<T>(&self, key: &str) -> Option<T>
+    where
+        T: std::str::FromStr,
+    {
+        self.params.get(key)?.parse().ok()
+    }
+
+    /// Insert a parameter
+    pub fn insert(&mut self, key: String, value: String) {
+        self.params.insert(key, value);
+    }
+
+    /// Set a parameter (alias for insert)
+    pub fn set(&mut self, key: String, value: String) {
+        self.params.insert(key, value);
+    }
+
+    /// Check if parameter exists
+    pub fn contains(&self, key: &str) -> bool {
+        self.params.contains_key(key)
+    }
+
+    /// Get all parameters as a reference to the HashMap
+    pub fn all(&self) -> &HashMap<String, String> {
+        &self.params
+    }
+
+    /// Get mutable reference to parameters HashMap
+    pub fn all_mut(&mut self) -> &mut HashMap<String, String> {
+        &mut self.params
+    }
+
+    /// Iterate over all parameters
+    pub fn iter(&self) -> impl Iterator<Item = (&String, &String)> {
+        self.params.iter()
+    }
+
+    /// Check if parameters are empty
+    pub fn is_empty(&self) -> bool {
+        self.params.is_empty()
+    }
+
+    /// Get number of parameters
+    pub fn len(&self) -> usize {
+        self.params.len()
+    }
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Route parameters tests
+
+    #[test]
+    fn test_route_params_basic() {
+        let mut params = RouteParams::new();
+        params.insert("id".to_string(), "123".to_string());
+
+        assert_eq!(params.get("id"), Some(&"123".to_string()));
+        assert!(params.contains("id"));
+        assert!(!params.contains("missing"));
+    }
+
+    #[test]
+    fn test_route_params_get_as() {
+        let mut params = RouteParams::new();
+        params.insert("id".to_string(), "123".to_string());
+        params.insert("active".to_string(), "true".to_string());
+
+        assert_eq!(params.get_as::<i32>("id"), Some(123));
+        assert_eq!(params.get_as::<u32>("id"), Some(123));
+        assert_eq!(params.get_as::<bool>("active"), Some(true));
+        assert_eq!(params.get_as::<i32>("missing"), None);
+    }
+
+    #[test]
+    fn test_route_params_from_map() {
+        let mut map = HashMap::new();
+        map.insert("name".to_string(), "John".to_string());
+        map.insert("age".to_string(), "30".to_string());
+
+        let params = RouteParams::from_map(map);
+
+        assert_eq!(params.get("name"), Some(&"John".to_string()));
+        assert_eq!(params.get_as::<i32>("age"), Some(30));
+    }
+
+    #[test]
+    fn test_route_params_set() {
+        let mut params = RouteParams::new();
+        params.set("key".to_string(), "value".to_string());
+
+        assert_eq!(params.get("key"), Some(&"value".to_string()));
+    }
+
+    #[test]
+    fn test_route_params_all() {
+        let mut params = RouteParams::new();
+        params.insert("a".to_string(), "1".to_string());
+        params.insert("b".to_string(), "2".to_string());
+
+        let all = params.all();
+        assert_eq!(all.len(), 2);
+        assert_eq!(all.get("a"), Some(&"1".to_string()));
+    }
+
+    #[test]
+    fn test_route_params_iter() {
+        let mut params = RouteParams::new();
+        params.insert("x".to_string(), "1".to_string());
+        params.insert("y".to_string(), "2".to_string());
+
+        let count = params.iter().count();
+        assert_eq!(count, 2);
+    }
+
+    #[test]
+    fn test_route_params_empty() {
+        let params = RouteParams::new();
+        assert!(params.is_empty());
+        assert_eq!(params.len(), 0);
+
+        let mut params = RouteParams::new();
+        params.insert("key".to_string(), "value".to_string());
+        assert!(!params.is_empty());
+        assert_eq!(params.len(), 1);
+    }
+}
+
+// ============================================================================
+// Query Parameters
+// ============================================================================
+
+/// Query parameters parsed from URL query string
+///
+/// Supports multiple values for the same key.
+///
+/// # Example
+///
+/// ```
+/// use gpui_router::QueryParams;
+///
+/// let query = QueryParams::from_query_string("page=1&sort=name&tag=rust&tag=gpui");
+///
+/// assert_eq!(query.get("page"), Some(&"1".to_string()));
+/// assert_eq!(query.get_as::<i32>("page"), Some(1));
+/// assert_eq!(query.get_all("tag").unwrap().len(), 2);
+/// ```
+#[derive(Debug, Clone, Default)]
+pub struct QueryParams {
+    params: HashMap<String, Vec<String>>,
+}
+
+impl QueryParams {
+    /// Create new empty query params
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Parse from query string
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use gpui_router::QueryParams;
+    ///
+    /// let query = QueryParams::from_query_string("page=1&sort=name");
+    /// assert_eq!(query.get("page"), Some(&"1".to_string()));
+    /// ```
+    pub fn from_query_string(query: &str) -> Self {
+        let mut params = HashMap::new();
+
+        for pair in query.split('&') {
+            if let Some((key, value)) = pair.split_once('=') {
+                // Simple URL decoding (replace %20 with space, etc.)
+                let key = decode_uri_component(key);
+                let value = decode_uri_component(value);
+
+                params.entry(key).or_insert_with(Vec::new).push(value);
+            }
+        }
+
+        Self { params }
+    }
+
+    /// Get first value for a parameter
+    pub fn get(&self, key: &str) -> Option<&String> {
+        self.params.get(key)?.first()
+    }
+
+    /// Get all values for a parameter
+    ///
+    /// Useful for parameters that can appear multiple times like `?tag=rust&tag=gpui`
+    pub fn get_all(&self, key: &str) -> Option<&Vec<String>> {
+        self.params.get(key)
+    }
+
+    /// Get parameter as a specific type
+    ///
+    /// Returns the first value parsed as type T.
+    pub fn get_as<T>(&self, key: &str) -> Option<T>
+    where
+        T: std::str::FromStr,
+    {
+        self.get(key)?.parse().ok()
+    }
+
+    /// Insert a parameter
+    ///
+    /// If the key already exists, the value is appended to the list.
+    pub fn insert(&mut self, key: String, value: String) {
+        self.params.entry(key).or_default().push(value);
+    }
+
+    /// Check if parameter exists
+    pub fn contains(&self, key: &str) -> bool {
+        self.params.contains_key(key)
+    }
+
+    /// Convert to query string
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use gpui_router::QueryParams;
+    ///
+    /// let mut query = QueryParams::new();
+    /// query.insert("page".to_string(), "1".to_string());
+    /// let s = query.to_query_string();
+    /// assert!(s.contains("page=1"));
+    /// ```
+    pub fn to_query_string(&self) -> String {
+        let pairs: Vec<String> = self
+            .params
+            .iter()
+            .flat_map(|(key, values)| {
+                values.iter().map(move |value| {
+                    format!(
+                        "{}={}",
+                        encode_uri_component(key),
+                        encode_uri_component(value)
+                    )
+                })
+            })
+            .collect();
+
+        pairs.join("&")
+    }
+
+    /// Check if parameters are empty
+    pub fn is_empty(&self) -> bool {
+        self.params.is_empty()
+    }
+
+    /// Get number of unique parameter keys
+    pub fn len(&self) -> usize {
+        self.params.len()
+    }
+}
+
+/// Simple URI component encoding (encode special characters)
+fn encode_uri_component(s: &str) -> String {
+    s.chars()
+        .map(|c| match c {
+            'A'..='Z' | 'a'..='z' | '0'..='9' | '-' | '_' | '.' | '~' => c.to_string(),
+            ' ' => "%20".to_string(),
+            _ => format!("%{:02X}", c as u8),
+        })
+        .collect()
+}
+
+/// Simple URI component decoding
+fn decode_uri_component(s: &str) -> String {
+    let mut result = String::new();
+    let mut chars = s.chars().peekable();
+
+    while let Some(c) = chars.next() {
+        if c == '%' {
+            // Try to decode hex pair
+            let hex: String = chars.by_ref().take(2).collect();
+            if let Ok(byte) = u8::from_str_radix(&hex, 16) {
+                result.push(byte as char);
+            } else {
+                result.push('%');
+                result.push_str(&hex);
+            }
+        } else if c == '+' {
+            result.push(' ');
+        } else {
+            result.push(c);
+        }
+    }
+
+    result
+}
+
+// Query parameters tests
+
+#[test]
+fn test_query_params_basic() {
+    let query = QueryParams::from_query_string("page=1&sort=name&filter=active");
+
+    assert_eq!(query.get("page"), Some(&"1".to_string()));
+    assert_eq!(query.get("sort"), Some(&"name".to_string()));
+    assert_eq!(query.get("filter"), Some(&"active".to_string()));
+    assert_eq!(query.get("missing"), None);
+}
+
+#[test]
+fn test_query_params_get_as() {
+    let query = QueryParams::from_query_string("page=1&limit=50&active=true");
+
+    assert_eq!(query.get_as::<i32>("page"), Some(1));
+    assert_eq!(query.get_as::<usize>("limit"), Some(50));
+    assert_eq!(query.get_as::<bool>("active"), Some(true));
+    assert_eq!(query.get_as::<i32>("missing"), None);
+}
+
+#[test]
+fn test_query_params_multiple_values() {
+    let query = QueryParams::from_query_string("tag=rust&tag=gpui&tag=ui");
+
+    let tags = query.get_all("tag").unwrap();
+    assert_eq!(tags.len(), 3);
+    assert!(tags.contains(&"rust".to_string()));
+    assert!(tags.contains(&"gpui".to_string()));
+    assert!(tags.contains(&"ui".to_string()));
+
+    // get() returns first value
+    assert_eq!(query.get("tag"), Some(&"rust".to_string()));
+}
+
+#[test]
+fn test_query_params_insert() {
+    let mut query = QueryParams::new();
+    query.insert("key".to_string(), "value1".to_string());
+    query.insert("key".to_string(), "value2".to_string());
+
+    let values = query.get_all("key").unwrap();
+    assert_eq!(values.len(), 2);
+    assert_eq!(values[0], "value1");
+    assert_eq!(values[1], "value2");
+}
+
+#[test]
+fn test_uri_encoding() {
+    let encoded = encode_uri_component("hello world");
+    assert_eq!(encoded, "hello%20world");
+
+    let encoded = encode_uri_component("test@example.com");
+    assert!(encoded.contains("%40")); // @ encoded as %40
+}
+
+#[test]
+fn test_uri_decoding() {
+    let decoded = decode_uri_component("hello%20world");
+    assert_eq!(decoded, "hello world");
+
+    let decoded = decode_uri_component("hello+world");
+    assert_eq!(decoded, "hello world");
+}
+
+#[test]
+fn test_to_query_string() {
+    let mut query = QueryParams::new();
+    query.insert("page".to_string(), "1".to_string());
+    query.insert("sort".to_string(), "name".to_string());
+
+    let s = query.to_query_string();
+    // Order may vary, check both keys are present
+    assert!(s.contains("page=1"));
+    assert!(s.contains("sort=name"));
+}
+
+#[test]
+fn test_query_params_empty() {
+    let query = QueryParams::new();
+    assert!(query.is_empty());
+    assert_eq!(query.len(), 0);
+
+    let mut query = QueryParams::new();
+    query.insert("key".to_string(), "value".to_string());
+    assert!(!query.is_empty());
+    assert_eq!(query.len(), 1);
+}
+
+#[test]
+fn test_empty_query_string() {
+    let query = QueryParams::from_query_string("");
+    assert!(query.is_empty());
+}

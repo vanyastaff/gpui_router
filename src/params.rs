@@ -10,7 +10,7 @@ use std::collections::HashMap;
 /// # Example
 ///
 /// ```
-/// use gpui_router::RouteParams;
+/// use gpui-navigator::RouteParams;
 ///
 /// // Route pattern: /users/:id
 /// // Matched path: /users/123
@@ -189,7 +189,7 @@ mod tests {
 /// # Example
 ///
 /// ```
-/// use gpui_router::QueryParams;
+/// use gpui-navigator::QueryParams;
 ///
 /// let query = QueryParams::from_query_string("page=1&sort=name&tag=rust&tag=gpui");
 ///
@@ -213,7 +213,7 @@ impl QueryParams {
     /// # Example
     ///
     /// ```
-    /// use gpui_router::QueryParams;
+    /// use gpui-navigator::QueryParams;
     ///
     /// let query = QueryParams::from_query_string("page=1&sort=name");
     /// assert_eq!(query.get("page"), Some(&"1".to_string()));
@@ -273,7 +273,7 @@ impl QueryParams {
     /// # Example
     ///
     /// ```
-    /// use gpui_router::QueryParams;
+    /// use gpui-navigator::QueryParams;
     ///
     /// let mut query = QueryParams::new();
     /// query.insert("page".to_string(), "1".to_string());

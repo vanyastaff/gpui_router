@@ -62,7 +62,7 @@ impl LifecycleResult {
 /// # Example
 ///
 /// ```no_run
-/// use gpui_router::{RouteLifecycle, LifecycleResult, NavigationRequest};
+/// use gpui-navigator::{RouteLifecycle, LifecycleResult, NavigationRequest};
 /// use std::future::Future;
 /// use std::pin::Pin;
 ///

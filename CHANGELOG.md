@@ -98,5 +98,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Doc comments for all public APIs
 - Example application: `transition_demo`
 
-[Unreleased]: https://github.com/nicholasoxford/gpui_router/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/nicholasoxford/gpui_router/releases/tag/v0.1.0
+[Unreleased]: https://github.com/nicholasoxford/gpui-navigator/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/nicholasoxford/gpui-navigator/releases/tag/v0.1.0

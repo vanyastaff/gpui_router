@@ -52,7 +52,7 @@ impl NamedRouteRegistry {
     /// # Example
     ///
     /// ```
-    /// use gpui_router::{NamedRouteRegistry, RouteParams};
+    /// use gpui-navigator::{NamedRouteRegistry, RouteParams};
     ///
     /// let mut registry = NamedRouteRegistry::new();
     /// registry.register("user.detail", "/users/:id");
@@ -296,7 +296,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::Route;
+    /// use gpui-navigator::Route;
     /// use gpui::*;
     ///
     /// // Simple static route
@@ -339,7 +339,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, router_outlet};
+    /// use gpui-navigator::{Route, router_outlet};
     /// use gpui::*;
     ///
     /// Route::new("/dashboard", |cx, params| {
@@ -368,7 +368,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::Route;
+    /// use gpui-navigator::Route;
     /// use gpui::*;
     ///
     /// Route::new("/dashboard", |_cx, _params| div())
@@ -395,7 +395,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::Route;
+    /// use gpui-navigator::Route;
     /// use gpui::*;
     ///
     /// Route::new("/admin", |_cx, _params| div())
@@ -416,7 +416,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, render_router_outlet};
+    /// use gpui-navigator::{Route, render_router_outlet};
     /// use gpui::*;
     ///
     /// Route::new("/dashboard", |cx, _params| {
@@ -443,7 +443,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, AuthGuard, RoleGuard};
+    /// use gpui-navigator::{Route, AuthGuard, RoleGuard};
     /// use gpui::*;
     ///
     /// fn is_authenticated(_cx: &App) -> bool { true }
@@ -471,7 +471,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, BoxedGuard};
+    /// use gpui-navigator::{Route, BoxedGuard};
     /// use gpui::*;
     ///
     /// Route::new("/admin", |_cx, _params| div())
@@ -492,7 +492,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::Route;
+    /// use gpui-navigator::Route;
     /// use gpui::*;
     ///
     /// // Route::new("/dashboard", |_cx, _params| div().into_any_element())
@@ -514,7 +514,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, BoxedMiddleware};
+    /// use gpui-navigator::{Route, BoxedMiddleware};
     /// use gpui::*;
     ///
     /// Route::new("/dashboard", |_cx, _params| div().into_any_element())
@@ -535,7 +535,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui_router::{Route, RouteLifecycle, LifecycleResult, NavigationRequest};
+    /// use gpui-navigator::{Route, RouteLifecycle, LifecycleResult, NavigationRequest};
     /// use gpui::*;
     /// use std::pin::Pin;
     /// use std::future::Future;
@@ -559,7 +559,7 @@ impl Route {
     ///
     /// # Example
     /// ```no_run
-    /// use gpui_router::{Route, Transition};
+    /// use gpui-navigator::{Route, Transition};
     /// use gpui::*;
     ///
     /// Route::new("/page", |_cx, _params| div().into_any_element())
@@ -682,7 +682,7 @@ fn match_path(pattern: &str, path: &str) -> Option<RouteMatch> {
 ///
 /// This allows Navigator.push() to accept both strings and route builders:
 /// ```ignore
-/// use gpui_router::{Navigator, PageRoute};
+/// use gpui-navigator::{Navigator, PageRoute};
 ///
 /// // String path
 /// Navigator::push(cx, "/users");
@@ -741,7 +741,7 @@ impl IntoRoute for &str {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{Navigator, PageRoute};
+/// use gpui-navigator::{Navigator, PageRoute};
 ///
 /// // Simple path (no builder)
 /// Navigator::push(cx, PageRoute::new("/users"));
@@ -838,7 +838,7 @@ impl IntoRoute for PageRoute {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{Navigator, NamedRoute, RouteParams};
+/// use gpui-navigator::{Navigator, NamedRoute, RouteParams};
 ///
 /// let mut params = RouteParams::new();
 /// params.set("userId".to_string(), "123".to_string());

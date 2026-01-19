@@ -1,11 +1,11 @@
-# GPUI Router
+# GPUI Navigator
 
-[![Crates.io](https://img.shields.io/crates/v/gpui_router.svg)](https://crates.io/crates/gpui_router)
-[![Documentation](https://docs.rs/gpui_router/badge.svg)](https://docs.rs/gpui_router)
-[![License](https://img.shields.io/crates/l/gpui_router.svg)](LICENSE-MIT)
-[![CI](https://github.com/nicholasoxford/gpui_router/workflows/CI/badge.svg)](https://github.com/nicholasoxford/gpui_router/actions)
+[![Crates.io](https://img.shields.io/crates/v/gpui-navigator.svg)](https://crates.io/crates/gpui-navigator)
+[![Documentation](https://docs.rs/gpui-navigator/badge.svg)](https://docs.rs/gpui-navigator)
+[![License](https://img.shields.io/crates/l/gpui-navigator.svg)](LICENSE-MIT)
+[![CI](https://github.com/vanyastaff/gpui-navigator/workflows/CI/badge.svg)](https://github.com/vanyastaff/gpui-navigator/actions)
 
-A declarative routing library for [GPUI](https://gpui.rs) with support for nested routes, transitions, guards, and middleware.
+A declarative navigation library for [GPUI](https://gpui.rs) with support for nested routes, transitions, guards, and middleware.
 
 ## Features
 
@@ -25,7 +25,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-gpui_router = "0.1"
+gpui-navigator = "0.1"
 gpui = "0.2"
 ```
 
@@ -33,7 +33,7 @@ gpui = "0.2"
 
 ```rust
 use gpui::*;
-use gpui_router::*;
+use gpui-navigator::*;
 
 fn main() {
     Application::new().run(|cx| {
@@ -83,7 +83,7 @@ impl Render for AppView {
 The library provides a Flutter-style navigation API:
 
 ```rust
-use gpui_router::Navigator;
+use gpui-navigator::Navigator;
 
 // Push new route
 Navigator::push(cx, "/profile");
@@ -121,7 +121,7 @@ Navigator::push(cx, "/users/123");
 The router supports smooth transitions between routes:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 // Fade transition
 Route::new("/fade", page).transition(Transition::fade(300))
@@ -146,7 +146,7 @@ Route::new("/instant", page).transition(Transition::None)
 Create hierarchical route structures with `RouterOutlet`:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 fn dashboard_layout(_cx: &mut App, _params: &RouteParams) -> AnyElement {
     div()
@@ -174,7 +174,7 @@ init_router(cx, |router| {
 Extract parameters from route paths:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 // Define route with parameter
 Route::new("/users/:id", user_profile)
@@ -199,7 +199,7 @@ let id: Option<u32> = params.get_as("id");
 Protect routes with authentication and authorization:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 // Authentication guard with custom check function
 fn is_authenticated(cx: &App) -> bool {
@@ -246,7 +246,7 @@ Route::new("/premium", premium_page)
 Add before/after hooks to routes:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 // Create middleware from functions
 struct LoggingMiddleware;
@@ -274,7 +274,7 @@ Route::new("/", home_page)
 Navigate using route names:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 // Define named route
 Route::new("/profile/:id", profile_page)
@@ -296,7 +296,7 @@ if let Some(url) = Navigator::url_for(cx, "user-profile", &params) {
 Custom error and 404 handlers:
 
 ```rust
-use gpui_router::*;
+use gpui-navigator::*;
 
 init_router(cx, |router| {
     router

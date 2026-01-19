@@ -757,7 +757,7 @@ pub type ResolvedChildRoute = (Arc<Route>, RouteParams);
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{Route, RouteParams, resolve_child_route};
+/// use gpui-navigator::{Route, RouteParams, resolve_child_route};
 ///
 /// let parent = Route::new("/dashboard", |_cx, _params| gpui::div().into_any_element())
 ///     .children(vec![
@@ -910,7 +910,7 @@ fn find_index_route(children: &[Arc<Route>], params: RouteParams) -> Option<Reso
 /// # Example
 ///
 /// ```
-/// use gpui_router::build_child_path;
+/// use gpui-navigator::build_child_path;
 ///
 /// let full_path = build_child_path("/dashboard", "settings");
 /// assert_eq!(full_path, "/dashboard/settings");

@@ -29,7 +29,7 @@ use std::time::Duration;
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{Route, RouterOutlet, RouteParams};
+/// use gpui-navigator::{Route, RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
 /// // Parent layout component
@@ -67,7 +67,7 @@ impl RouterOutlet {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui_router::{RouterOutlet, RouteParams};
+    /// use gpui-navigator::{RouterOutlet, RouteParams};
     /// use gpui::*;
     ///
     /// // Parent layout with multiple outlets
@@ -550,7 +550,7 @@ impl Render for RouterOutlet {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{router_outlet, RouteParams};
+/// use gpui-navigator::{router_outlet, RouteParams};
 /// use gpui::*;
 ///
 /// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
@@ -569,7 +569,7 @@ pub fn router_outlet(cx: &mut App) -> impl IntoElement {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{router_outlet, router_outlet_named, RouteParams};
+/// use gpui-navigator::{router_outlet, router_outlet_named, RouteParams};
 /// use gpui::*;
 ///
 /// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
@@ -591,7 +591,7 @@ pub fn router_outlet_named(cx: &mut App, name: impl Into<String>) -> impl IntoEl
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{render_router_outlet, RouteParams};
+/// use gpui-navigator::{render_router_outlet, RouteParams};
 /// use gpui::*;
 ///
 /// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
@@ -818,7 +818,7 @@ use gpui::*;
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::RouterLink;
+/// use gpui-navigator::RouterLink;
 ///
 /// RouterLink::new("/products")
 ///     .child("View Products")

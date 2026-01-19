@@ -14,7 +14,7 @@
 //!
 //! ```ignore
 //! use gpui::*;
-//! use gpui_router::*;
+//! use gpui-navigator::*;
 //!
 //! fn main() {
 //!     Application::new().run(|cx| {
@@ -49,7 +49,7 @@
 //! The library provides a simple navigation API:
 //!
 //! ```ignore
-//! use gpui_router::Navigator;
+//! use gpui-navigator::Navigator;
 //!
 //! // Push new route
 //! Navigator::push(cx, "/profile");
@@ -69,7 +69,7 @@
 //! Protect routes with authentication and authorization:
 //!
 //! ```no_run
-//! use gpui_router::*;
+//! use gpui-navigator::*;
 //!
 //! Route::new("/admin", admin_page)
 //!     .guard(AuthGuard::new(is_logged_in, "/login"))
@@ -85,7 +85,7 @@
 //! Create hierarchical route structures:
 //!
 //! ```no_run
-//! use gpui_router::*;
+//! use gpui-navigator::*;
 //!
 //! Route::new("/dashboard", dashboard_layout)
 //!     .children(vec![
@@ -103,7 +103,7 @@
 //! - `log` (default) - Uses the standard `log` crate for logging
 //! - `tracing` - Uses the `tracing` crate for structured logging (mutually exclusive with `log`)
 
-#![doc(html_root_url = "https://docs.rs/gpui_router/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/gpui-navigator/0.1.0")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 // Lints are configured in Cargo.toml [lints] section
 
@@ -183,7 +183,7 @@ use std::collections::HashMap;
 /// # Example
 ///
 /// ```
-/// use gpui_router::RouteMatch;
+/// use gpui-navigator::RouteMatch;
 ///
 /// let route_match = RouteMatch::new("/users/123".to_string())
 ///     .with_param("id".to_string(), "123".to_string());

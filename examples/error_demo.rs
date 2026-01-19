@@ -4,7 +4,7 @@
 
 use gpui::prelude::*;
 use gpui::*;
-use gpui_router::*;
+use gpui-navigator::*;
 
 fn main() {
     env_logger::init();

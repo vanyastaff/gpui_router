@@ -97,7 +97,7 @@ impl GuardResult {
 /// # Example
 ///
 /// ```no_run
-/// use gpui_router::{RouteGuard, GuardResult, NavigationRequest};
+/// use gpui-navigator::{RouteGuard, GuardResult, NavigationRequest};
 /// use std::future::Future;
 /// use std::pin::Pin;
 ///
@@ -128,7 +128,7 @@ impl GuardResult {
 /// Use the `guard_fn` helper to create guards from async closures:
 ///
 /// ```no_run
-/// use gpui_router::{guard_fn, GuardResult};
+/// use gpui-navigator::{guard_fn, GuardResult};
 ///
 /// let guard = guard_fn(|_cx, _request| async move {
 ///     // Replace with actual authentication check
@@ -187,7 +187,7 @@ pub type BoxedGuard =
 /// # Example
 ///
 /// ```no_run
-/// use gpui_router::{guard_fn, GuardResult};
+/// use gpui-navigator::{guard_fn, GuardResult};
 ///
 /// let auth_guard = guard_fn(|_cx, _request| async move {
 ///     // Replace with actual authentication check
@@ -383,7 +383,7 @@ pub type AuthCheckFn = Box<dyn Fn(&App) -> bool + Send + Sync>;
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::*;
+/// use gpui-navigator::*;
 /// use gpui::App;
 ///
 /// // Define your authentication check
@@ -398,7 +398,7 @@ pub type AuthCheckFn = Box<dyn Fn(&App) -> bool + Send + Sync>;
 /// Route::new("/dashboard", dashboard_page)
 ///     .guard(AuthGuard::new(is_authenticated, "/login"))
 /// # ;
-/// # fn dashboard_page(_: &mut App, _: &gpui_router::RouteParams) -> gpui::AnyElement { todo!() }
+/// # fn dashboard_page(_: &mut App, _: &gpui-navigator::RouteParams) -> gpui::AnyElement { todo!() }
 /// # struct AuthState;
 /// # impl AuthState { fn is_logged_in(&self) -> bool { false } }
 /// ```
@@ -420,7 +420,7 @@ impl AuthGuard {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui_router::*;
+    /// use gpui-navigator::*;
     ///
     /// let guard = AuthGuard::new(
     ///     |cx| cx.try_global::<IsLoggedIn>().is_some(),
@@ -492,7 +492,7 @@ pub type RoleExtractorFn = Box<dyn Fn(&App) -> Option<String> + Send + Sync>;
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::*;
+/// use gpui-navigator::*;
 /// use gpui::App;
 ///
 /// // Define how to get user's role
@@ -505,7 +505,7 @@ pub type RoleExtractorFn = Box<dyn Fn(&App) -> Option<String> + Send + Sync>;
 /// Route::new("/admin", admin_page)
 ///     .guard(RoleGuard::new(get_user_role, "admin", Some("/forbidden")))
 /// # ;
-/// # fn admin_page(_: &mut App, _: &gpui_router::RouteParams) -> gpui::AnyElement { todo!() }
+/// # fn admin_page(_: &mut App, _: &gpui-navigator::RouteParams) -> gpui::AnyElement { todo!() }
 /// # struct CurrentUser { role: String }
 /// ```
 pub struct RoleGuard {
@@ -529,7 +529,7 @@ impl RoleGuard {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui_router::*;
+    /// use gpui-navigator::*;
     ///
     /// let guard = RoleGuard::new(
     ///     |cx| cx.try_global::<UserRole>().map(|r| r.0.clone()),
@@ -602,7 +602,7 @@ pub type PermissionCheckFn = Box<dyn Fn(&App, &str) -> bool + Send + Sync>;
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::*;
+/// use gpui-navigator::*;
 /// use gpui::App;
 ///
 /// // Define permission check
@@ -616,7 +616,7 @@ pub type PermissionCheckFn = Box<dyn Fn(&App, &str) -> bool + Send + Sync>;
 /// Route::new("/users/:id/delete", delete_user)
 ///     .guard(PermissionGuard::new(has_permission, "users.delete"))
 /// # ;
-/// # fn delete_user(_: &mut App, _: &gpui_router::RouteParams) -> gpui::AnyElement { todo!() }
+/// # fn delete_user(_: &mut App, _: &gpui-navigator::RouteParams) -> gpui::AnyElement { todo!() }
 /// # struct UserPermissions;
 /// # impl UserPermissions { fn contains(&self, _: &str) -> bool { false } }
 /// ```
@@ -640,7 +640,7 @@ impl PermissionGuard {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui_router::*;
+    /// use gpui-navigator::*;
     ///
     /// let guard = PermissionGuard::new(
     ///     |cx, perm| {
@@ -716,7 +716,7 @@ impl RouteGuard for PermissionGuard {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{Guards, AuthGuard, RoleGuard};
+/// use gpui-navigator::{Guards, AuthGuard, RoleGuard};
 ///
 /// // Builder syntax for combining guards
 /// let guard = Guards::builder()
@@ -733,7 +733,7 @@ impl Guards {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui_router::{Guards, BoxedGuard};
+    /// use gpui-navigator::{Guards, BoxedGuard};
     ///
     /// let guard = Guards::new(vec![
     ///     // Add boxed guards here
@@ -760,7 +760,7 @@ impl Guards {
 ///
 /// # Example
 /// ```ignore
-/// use gpui_router::{guards, AuthGuard, RoleGuard};
+/// use gpui-navigator::{guards, AuthGuard, RoleGuard};
 ///
 /// let guard = guards![
 ///     AuthGuard::new(|_| true, "/login"),
@@ -854,7 +854,7 @@ impl RouteGuard for Guards {
 /// # Example
 ///
 /// ```ignore
-/// use gpui_router::{NotGuard, AuthGuard};
+/// use gpui-navigator::{NotGuard, AuthGuard};
 ///
 /// // Allow only if NOT authenticated (for login page)
 /// let guard = NotGuard::new(AuthGuard::new(|_| true, "/login"));

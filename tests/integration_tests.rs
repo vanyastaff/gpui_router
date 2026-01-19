@@ -1,10 +1,10 @@
-//! Integration tests for gpui_router
+//! Integration tests for gpui-navigator
 //!
 //! These tests verify the complete router workflow including initialization,
 //! navigation, guards, and route matching.
 
 use gpui::{div, IntoElement, ParentElement, TestAppContext};
-use gpui_router::*;
+use gpui-navigator::*;
 
 // ============================================================================
 // Router Initialization Tests
@@ -364,7 +364,7 @@ fn test_navigation_result_variants() {
 
 #[test]
 fn test_history_operations() {
-    use gpui_router::history::History;
+    use gpui-navigator::history::History;
 
     let mut history = History::new("/".to_string());
 
@@ -387,7 +387,7 @@ fn test_history_operations() {
 
 #[test]
 fn test_history_truncation() {
-    use gpui_router::history::History;
+    use gpui-navigator::history::History;
 
     let mut history = History::new("/".to_string());
     history.push("/page1".to_string());
@@ -471,7 +471,7 @@ fn test_route_cache_stats() {
     assert_eq!(cache.stats().parent_misses, 1);
 
     // Set and hit
-    cache.set_parent("/test".to_string(), gpui_router::RouteId::from_path("/"));
+    cache.set_parent("/test".to_string(), gpui-navigator::RouteId::from_path("/"));
     cache.get_parent("/test");
     assert_eq!(cache.stats().parent_hits, 1);
 
@@ -500,7 +500,7 @@ async fn test_not_found_handler_rendering(cx: &mut TestAppContext) {
 
 #[gpui::test]
 async fn test_error_handler_rendering(cx: &mut TestAppContext) {
-    use gpui_router::NavigationError;
+    use gpui-navigator::NavigationError;
 
     let handlers = ErrorHandlers::new()
         .on_not_found(|_cx, path| {
@@ -528,7 +528,7 @@ async fn test_error_handler_rendering(cx: &mut TestAppContext) {
 
 #[gpui::test]
 async fn test_custom_error_pages(cx: &mut TestAppContext) {
-    use gpui_router::NavigationError;
+    use gpui-navigator::NavigationError;
 
     let handlers = ErrorHandlers::new()
         .on_not_found(|_cx, path| {

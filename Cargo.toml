@@ -1,17 +1,17 @@
 [package]
-name = "gpui_router"
+name = "gpui-navigator"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
-description = "Declarative router for GPUI with transitions, nested routing, guards, and middleware"
+description = "Navigator for GPUI with transitions, nested routing, guards, and middleware"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
-documentation = "https://docs.rs/gpui_router"
-homepage = "https://github.com/vanyastaff/gpui_router"
-repository = "https://github.com/vanyastaff/gpui_router"
-keywords = ["gpui", "router", "navigation", "declarative", "ui"]
+documentation = "https://docs.rs/gpui-navigator"
+homepage = "https://github.com/vanyastaff/gpui-navigator"
+repository = "https://github.com/vanyastaff/gpui-navigator"
+keywords = ["gpui", "navigator", "navigation", "transitions", "ui"]
 categories = ["gui", "development-tools"]
-authors = ["gpui_router contributors"]
+authors = ["gpui-navigator contributors"]
 exclude = [
     ".github/",
     ".idea/",

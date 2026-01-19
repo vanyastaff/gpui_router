@@ -2264,6 +2264,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "gpui-navigator"
+version = "0.1.0"
+dependencies = [
+ "env_logger",
+ "gpui",
+ "log",
+ "lru",
+ "pollster 0.4.0",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
 name = "gpui_collections"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2344,19 +2357,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "258cb099254e9468181aee5614410fba61db4ae115fc1d51b4a0b985f60d6641"
 dependencies = [
  "gpui_derive_refineable",
-]
-
-[[package]]
-name = "gpui_router"
-version = "0.1.0"
-dependencies = [
- "env_logger",
- "gpui",
- "log",
- "lru",
- "pollster 0.4.0",
- "tokio",
- "tracing",
 ]
 
 [[package]]

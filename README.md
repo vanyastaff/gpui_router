@@ -10,14 +10,26 @@ A declarative navigation library for [GPUI](https://gpui.rs) with support for ne
 ## Features
 
 - 🎯 **Declarative Route Definition** - Define routes with a fluent builder API
-- 🎨 **Route Transitions** - Built-in fade, slide, and scale animations
+- 🎨 **Route Transitions** - Built-in fade, slide, and scale animations with dual enter/exit support
 - 🔀 **Nested Routing** - Support for parent/child route hierarchies with `RouterOutlet`
 - 🛡️ **Route Guards** - Authentication, authorization, and custom guards
 - 🔌 **Middleware** - Before/after hooks for navigation events
 - 📝 **Named Routes** - Navigate using route names instead of paths
 - 🔍 **Route Matching** - Pattern matching with parameters and constraints
 - 📊 **Performance** - Route cache for optimized lookups
-- ⚡ **Error Handling** - Custom 404 and error handlers
+- ⚡ **Error Handling** - Beautiful default error pages with customization support
+- 🎨 **RouterLink Widget** - Instant navigation with active state styling
+- 🖼️ **Default Pages** - Pre-styled 404, loading, and error pages out of the box
+
+## Why GPUI Navigator?
+
+Unlike other GPUI routers, Navigator focuses on:
+
+- **Smooth Animations**: Dual-animation transitions (separate enter/exit animations)
+- **Developer Experience**: Flutter-inspired API with intuitive navigation
+- **Production Ready**: Built-in error pages, guards, and middleware
+- **Type Safety**: Strongly typed route parameters and navigation
+- **Performance**: Efficient caching and minimal re-renders
 
 ## Installation
 
@@ -293,7 +305,21 @@ if let Some(url) = Navigator::url_for(cx, "user-profile", &params) {
 
 ## Error Handling
 
-Custom error and 404 handlers:
+### Default Error Pages
+
+GPUI Navigator provides beautiful, pre-styled error pages out of the box:
+
+```rust
+use gpui-navigator::*;
+
+// Use built-in default pages (404, loading, error)
+// These are automatically shown when routes don't match or errors occur
+// No configuration needed!
+```
+
+### Custom Error Pages
+
+Override default pages with your own:
 
 ```rust
 use gpui-navigator::*;
@@ -302,14 +328,75 @@ init_router(cx, |router| {
     router
         .error_handlers(ErrorHandlers::new()
             .on_not_found(|path, _cx| {
-                div().child(format!("404: {} not found", path)).into_any_element()
+                div()
+                    .child("Custom 404")
+                    .child(format!("Page '{}' not found", path))
+                    .into_any_element()
             })
             .on_error(|error, _cx| {
-                div().child(format!("Error: {}", error)).into_any_element()
+                div()
+                    .child("Custom Error")
+                    .child(format!("Error: {}", error))
+                    .into_any_element()
             })
         );
 });
 ```
+
+### Default Pages Configuration
+
+Customize the default pages system:
+
+```rust
+use gpui-navigator::*;
+
+let default_pages = DefaultPages::new()
+    .with_not_found(|| {
+        div().child("My Custom 404 Page").into_any_element()
+    })
+    .with_loading(|| {
+        div().child("Loading...").into_any_element()
+    })
+    .with_error(|message| {
+        div().child(format!("Error: {}", message)).into_any_element()
+    });
+
+// Use in your error handlers
+router.error_handlers(ErrorHandlers::new()
+    .on_not_found(|_path, _cx| default_pages.render_not_found())
+);
+```
+
+## RouterLink Widget
+
+Create navigation links with active state styling:
+
+```rust
+use gpui-navigator::*;
+
+// Basic link
+RouterLink::new("/about".to_string())
+    .child(div().child("About"))
+    .build(cx)
+
+// Link with active state styling
+RouterLink::new("/dashboard".to_string())
+    .child(div().px_4().py_2().child("Dashboard"))
+    .active_class(|div| {
+        div.bg(rgb(0x2196f3))
+           .text_color(white())
+    })
+    .build(cx)
+
+// Helper function for simpler usage
+router_link(cx, "/profile", "My Profile")
+```
+
+The RouterLink widget:
+- ✅ Automatically highlights when the route is active
+- ✅ Instant navigation with `cx.notify()` for immediate UI updates
+- ✅ Supports custom active state styling
+- ✅ Works with nested routes
 
 ## Examples
 

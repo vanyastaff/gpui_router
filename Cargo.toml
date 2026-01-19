@@ -1,6 +1,6 @@
 [package]
 name = "gpui-navigator"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 rust-version = "1.75"
 description = "Navigator for GPUI with transitions, nested routing, guards, and middleware"
@@ -15,7 +15,6 @@ authors = ["Vanya Stafford"]
 exclude = [
     ".github/",
     ".idea/",
-    ".claude/",
     "target/",
     "*.md",
     "!README.md",

@@ -304,26 +304,25 @@ impl Render for RouterOutlet {
                 previous_route.as_ref().map(|p| &p.path)
             );
 
+            // Build OLD and NEW content ONCE before match to avoid multiple builder() calls per render
+            let old_content_opt = previous_route.map(|prev| {
+                if let Some(builder) = prev.builder.as_ref() {
+                    builder(cx, &prev.params)
+                } else {
+                    not_found_page().into_any_element()
+                }
+            });
+
+            let new_content = if let Some(builder) = builder_opt.as_ref() {
+                builder(cx, &route_params)
+            } else {
+                not_found_page().into_any_element()
+            };
+
             // Build container with both old (exiting) and new (entering) content
             // For SLIDE transitions, use a different approach
             match &route_transition {
                 Transition::Slide { direction, .. } => {
-                    // Build OLD content (no animation wrapper, just the content)
-                    let old_content = previous_route.map(|prev| {
-                        if let Some(builder) = prev.builder.as_ref() {
-                            builder(cx, &prev.params)
-                        } else {
-                            not_found_page().into_any_element()
-                        }
-                    });
-
-                    // Build NEW content (no animation wrapper, just the content)
-                    let new_content = if let Some(builder) = builder_opt.as_ref() {
-                        builder(cx, &route_params)
-                    } else {
-                        not_found_page().into_any_element()
-                    };
-
                     // Create animated container that holds BOTH elements side-by-side
                     let animation_id = SharedString::from(format!(
                         "outlet_slide_{:?}_{}",
@@ -341,7 +340,7 @@ impl Render for RouterOutlet {
                                 .h_full()
                                 .overflow_hidden()
                                 // Old content (exits to left for SlideLeft, or stays for SlideRight)
-                                .when_some(old_content, |container, old| {
+                                .when_some(old_content_opt, |container, old| {
                                     container.child(
                                         div()
                                             .absolute()
@@ -397,7 +396,7 @@ impl Render for RouterOutlet {
                                 .h_full()
                                 .overflow_hidden()
                                 // Old content (exits up for SlideUp, or down for SlideDown)
-                                .when_some(old_content, |container, old| {
+                                .when_some(old_content_opt, |container, old| {
                                     container.child(
                                         div()
                                             .absolute()
@@ -446,29 +445,13 @@ impl Render for RouterOutlet {
                     }
                 }
                 Transition::Fade { .. } => {
-                    // Build OLD content (no animation wrapper, just the content)
-                    let old_content = previous_route.map(|prev| {
-                        if let Some(builder) = prev.builder.as_ref() {
-                            builder(cx, &prev.params)
-                        } else {
-                            not_found_page().into_any_element()
-                        }
-                    });
-
-                    // Build NEW content (no animation wrapper, just the content)
-                    let new_content = if let Some(builder) = builder_opt.as_ref() {
-                        builder(cx, &route_params)
-                    } else {
-                        not_found_page().into_any_element()
-                    };
-
                     div()
                         .relative()
                         .w_full()
                         .h_full()
                         .overflow_hidden()
                         // Old content (fades out)
-                        .when_some(old_content, |container, old| {
+                        .when_some(old_content_opt, |container, old| {
                             container.child(
                                 div()
                                     .absolute()
@@ -512,12 +495,6 @@ impl Render for RouterOutlet {
                 }
                 _ => {
                     // No transition or unsupported - just show new content
-                    let new_content = if let Some(builder) = builder_opt.as_ref() {
-                        builder(cx, &route_params)
-                    } else {
-                        not_found_page().into_any_element()
-                    };
-
                     div()
                         .relative()
                         .w_full()

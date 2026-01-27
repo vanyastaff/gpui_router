@@ -52,7 +52,7 @@ impl NamedRouteRegistry {
     /// # Example
     ///
     /// ```
-    /// use gpui-navigator::{NamedRouteRegistry, RouteParams};
+    /// use gpui_navigator::{NamedRouteRegistry, RouteParams};
     ///
     /// let mut registry = NamedRouteRegistry::new();
     /// registry.register("user.detail", "/users/:id");
@@ -301,7 +301,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::Route;
+    /// use gpui_navigator::Route;
     /// use gpui::*;
     ///
     /// // Simple static route
@@ -344,20 +344,20 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, router_outlet};
+    /// use gpui_navigator::{Route, render_router_outlet};
     /// use gpui::*;
     ///
-    /// Route::new("/dashboard", |cx, params| {
+    /// Route::new("/dashboard", |window, cx, params| {
     ///     div()
     ///         .child("Dashboard Header")
-    ///         .child(router_outlet(cx)) // Children render here
+    ///         .child(render_router_outlet(window, cx, None)) // Children render here
     /// })
     /// .children(vec![
-    ///     Route::new("overview", |_cx, _params| {
+    ///     Route::new("overview", |_, _cx, _params| {
     ///         div().child("Overview")
     ///     })
     ///     .into(),
-    ///     Route::new("settings", |_cx, _params| {
+    ///     Route::new("settings", |_, _cx, _params| {
     ///         div().child("Settings")
     ///     })
     ///     .into(),
@@ -373,12 +373,12 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::Route;
+    /// use gpui_navigator::Route;
     /// use gpui::*;
     ///
-    /// Route::new("/dashboard", |_cx, _params| div())
-    ///     .child(Route::new("overview", |_cx, _params| div()).into())
-    ///     .child(Route::new("settings", |_cx, _params| div()).into());
+    /// Route::new("/dashboard", |_, _cx, _params| div())
+    ///     .child(Route::new("overview", |_, _cx, _params| div()).into())
+    ///     .child(Route::new("settings", |_, _cx, _params| div()).into());
     /// ```
     pub fn child(mut self, child: RouteRef) -> Self {
         self.children.push(child);
@@ -400,10 +400,10 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::Route;
+    /// use gpui_navigator::Route;
     /// use gpui::*;
     ///
-    /// Route::new("/admin", |_cx, _params| div())
+    /// Route::new("/admin", |_, _cx, _params| div())
     ///     .meta("requiresAuth", "true")
     ///     .meta("requiredRole", "admin")
     ///     .meta("title", "Admin Panel");
@@ -421,19 +421,19 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, render_router_outlet};
+    /// use gpui_navigator::{Route, render_router_outlet};
     /// use gpui::*;
     ///
-    /// Route::new("/dashboard", |cx, _params| {
+    /// Route::new("/dashboard", |window, cx, _params| {
     ///     div()
-    ///         .child(render_router_outlet(cx, None))             // Main content
-    ///         .child(render_router_outlet(cx, Some("sidebar")))  // Sidebar
+    ///         .child(render_router_outlet(window, cx, None))             // Main content
+    ///         .child(render_router_outlet(window, cx, Some("sidebar")))  // Sidebar
     /// })
     /// .children(vec![
-    ///     Route::new("analytics", |_cx, _params| div()).into(),
+    ///     Route::new("analytics", |_, _cx, _params| div()).into(),
     /// ])
     /// .named_outlet("sidebar", vec![
-    ///     Route::new("stats", |_cx, _params| div()).into(),
+    ///     Route::new("stats", |_, _cx, _params| div()).into(),
     /// ]);
     /// ```
     pub fn named_outlet(mut self, name: impl Into<String>, children: Vec<RouteRef>) -> Self {
@@ -448,13 +448,13 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, AuthGuard, RoleGuard};
+    /// use gpui_navigator::{Route, AuthGuard, RoleGuard};
     /// use gpui::*;
     ///
     /// fn is_authenticated(_cx: &App) -> bool { true }
     /// fn get_role(_cx: &App) -> Option<String> { Some("user".into()) }
     ///
-    /// Route::new("/dashboard", |_cx, _params| div())
+    /// Route::new("/dashboard", |_, _cx, _params| div())
     ///     .guard(AuthGuard::new(is_authenticated, "/login"))
     ///     .guard(RoleGuard::new(get_role, "user", Some("/forbidden")));
     /// ```
@@ -476,10 +476,10 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, BoxedGuard};
+    /// use gpui_navigator::{Route, BoxedGuard};
     /// use gpui::*;
     ///
-    /// Route::new("/admin", |_cx, _params| div())
+    /// Route::new("/admin", |_, _cx, _params| div())
     ///     .guards(vec![
     ///         // Add boxed guards here
     ///     ]);
@@ -497,10 +497,10 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::Route;
+    /// use gpui_navigator::Route;
     /// use gpui::*;
     ///
-    /// // Route::new("/dashboard", |_cx, _params| div().into_any_element())
+    /// // Route::new("/dashboard", |_, _cx, _params| div().into_any_element())
     /// //     .middleware(LoggingMiddleware::new());
     /// ```
     #[cfg(feature = "middleware")]
@@ -519,10 +519,10 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, BoxedMiddleware};
+    /// use gpui_navigator::{Route, BoxedMiddleware};
     /// use gpui::*;
     ///
-    /// Route::new("/dashboard", |_cx, _params| div().into_any_element())
+    /// Route::new("/dashboard", |_, _cx, _params| div().into_any_element())
     ///     .middlewares(vec![
     ///         // Add boxed middleware here
     ///     ]);
@@ -540,7 +540,7 @@ impl Route {
     /// # Example
     ///
     /// ```no_run
-    /// use gpui-navigator::{Route, RouteLifecycle, LifecycleResult, NavigationRequest};
+    /// use gpui_navigator::{Route, RouteLifecycle, LifecycleResult, NavigationRequest};
     /// use gpui::*;
     /// use std::pin::Pin;
     /// use std::future::Future;
@@ -564,10 +564,10 @@ impl Route {
     ///
     /// # Example
     /// ```no_run
-    /// use gpui-navigator::{Route, Transition};
+    /// use gpui_navigator::{Route, Transition};
     /// use gpui::*;
     ///
-    /// Route::new("/page", |_cx, _params| div().into_any_element())
+    /// Route::new("/page", |_, _cx, _params| div().into_any_element())
     ///     .transition(Transition::fade(200));
     /// ```
     #[cfg(feature = "transition")]
@@ -692,13 +692,13 @@ fn match_path(pattern: &str, path: &str) -> Option<RouteMatch> {
 ///
 /// This allows Navigator.push() to accept both strings and route builders:
 /// ```ignore
-/// use gpui-navigator::{Navigator, PageRoute};
+/// use gpui_navigator::{Navigator, PageRoute};
 ///
 /// // String path
 /// Navigator::push(cx, "/users");
 ///
 /// // Route with builder
-/// Navigator::push(cx, PageRoute::builder("/profile", |_cx, _params| {
+/// Navigator::push(cx, PageRoute::builder("/profile", |_, _cx, _params| {
 ///     gpui::div()
 /// }));
 /// ```
@@ -751,7 +751,7 @@ impl IntoRoute for &str {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{Navigator, PageRoute};
+/// use gpui_navigator::{Navigator, PageRoute};
 ///
 /// // Simple path (no builder)
 /// Navigator::push(cx, PageRoute::new("/users"));
@@ -766,7 +766,7 @@ impl IntoRoute for &str {
 /// // With builder function
 /// Navigator::push(
 ///     cx,
-///     PageRoute::builder("/profile", |cx, params| {
+///     PageRoute::builder("/profile", |_window, cx, params| {
 ///         div().child("Profile Page")
 ///     })
 /// );
@@ -848,7 +848,7 @@ impl IntoRoute for PageRoute {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{Navigator, NamedRoute, RouteParams};
+/// use gpui_navigator::{Navigator, NamedRoute, RouteParams};
 ///
 /// let mut params = RouteParams::new();
 /// params.set("userId".to_string(), "123".to_string());

@@ -29,7 +29,7 @@ use std::time::Duration;
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{Route, RouterOutlet, RouteParams};
+/// use gpui_navigator::{Route, RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
 /// // Parent layout component
@@ -43,8 +43,8 @@ use std::time::Duration;
 /// // Configure nested routes
 /// Route::new("/dashboard", dashboard_layout)
 ///     .children(vec![
-///         Route::new("overview", |_cx, _params| div().into_any_element()),
-///         Route::new("settings", |_cx, _params| div().into_any_element()),
+///         Route::new("overview", |_, _cx, _params| div().into_any_element()),
+///         Route::new("settings", |_, _cx, _params| div().into_any_element()),
 ///     ]);
 /// ```
 #[derive(Clone)]
@@ -67,7 +67,7 @@ impl RouterOutlet {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{RouterOutlet, RouteParams};
+    /// use gpui_navigator::{RouterOutlet, RouteParams};
     /// use gpui::*;
     ///
     /// // Parent layout with multiple outlets
@@ -529,7 +529,7 @@ impl Render for RouterOutlet {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{RouterOutlet, RouteParams};
+/// use gpui_navigator::{RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
 /// struct Layout {
@@ -556,7 +556,7 @@ pub fn router_outlet(window: &mut Window, cx: &mut App) -> impl IntoElement {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{RouterOutlet, RouteParams};
+/// use gpui_navigator::{RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
 /// struct Layout {
@@ -590,7 +590,7 @@ pub fn router_outlet_named(
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{render_router_outlet, RouteParams};
+/// use gpui_navigator::{render_router_outlet, RouteParams};
 /// use gpui::*;
 ///
 /// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
@@ -817,7 +817,7 @@ use gpui::*;
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::RouterLink;
+/// use gpui_navigator::RouterLink;
 ///
 /// RouterLink::new("/products")
 ///     .child("View Products")

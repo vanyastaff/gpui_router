@@ -22,7 +22,7 @@ use gpui::{App, BorrowAppContext, Global};
 /// # Example
 ///
 /// ```
-/// use gpui-navigator::NavigationRequest;
+/// use gpui_navigator::NavigationRequest;
 ///
 /// let request = NavigationRequest::new("/dashboard".to_string());
 /// assert_eq!(request.to, "/dashboard");
@@ -226,7 +226,7 @@ impl GlobalRouter {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{GlobalRouter, Transition};
+    /// use gpui_navigator::{GlobalRouter, Transition};
     ///
     /// cx.update_global::<GlobalRouter, _>(|router, _| {
     ///     router.set_next_transition(Transition::fade(300));
@@ -265,7 +265,7 @@ impl GlobalRouter {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{GlobalRouter, Transition};
+    /// use gpui_navigator::{GlobalRouter, Transition};
     ///
     /// cx.update_global::<GlobalRouter, _>(|router, _| {
     ///     router.push_with_transition("/page".to_string(), Transition::slide_left(300));
@@ -330,7 +330,7 @@ impl UseRouter for App {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{init_router, Route};
+/// use gpui_navigator::{init_router, Route};
 ///
 /// fn main() {
 ///     App::new().run(|cx| {
@@ -355,7 +355,7 @@ where
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::navigate;
+/// use gpui_navigator::navigate;
 ///
 /// // In any component with access to App
 /// navigate(cx, "/users/123");
@@ -384,7 +384,7 @@ impl<C: BorrowAppContext> NavigatorHandle<'_, C> {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{Navigator, PageRoute};
+    /// use gpui_navigator::{Navigator, PageRoute};
     ///
     /// // Simple path
     /// Navigator::of(cx).push("/users");
@@ -439,7 +439,7 @@ impl<C: BorrowAppContext> NavigatorHandle<'_, C> {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::Navigator;
+/// use gpui_navigator::Navigator;
 ///
 /// // Navigate to a new route
 /// Navigator::push(cx, "/users/123");
@@ -457,7 +457,7 @@ impl Navigator {
     ///
     /// This allows chained navigation calls:
     /// ```ignore
-    /// use gpui-navigator::Navigator;
+    /// use gpui_navigator::Navigator;
     ///
     /// // Chained style
     /// Navigator::of(cx).push("/users");
@@ -476,7 +476,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{Navigator, PageRoute};
+    /// use gpui_navigator::{Navigator, PageRoute};
     ///
     /// // Simple string path
     /// Navigator::push(cx, "/users/123");
@@ -497,7 +497,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{Navigator, PageRoute};
+    /// use gpui_navigator::{Navigator, PageRoute};
     ///
     /// // Simple string path
     /// Navigator::replace(cx, "/login");
@@ -518,7 +518,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::Navigator;
+    /// use gpui_navigator::Navigator;
     ///
     /// if Navigator::can_pop(cx) {
     ///     Navigator::pop(cx);
@@ -549,7 +549,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::Navigator;
+    /// use gpui_navigator::Navigator;
     ///
     /// let path = Navigator::current_path(cx);
     /// ```
@@ -572,7 +572,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{Navigator, RouteParams};
+    /// use gpui_navigator::{Navigator, RouteParams};
     ///
     /// let mut params = RouteParams::new();
     /// params.set("id".into(), "123".into());
@@ -590,7 +590,7 @@ impl Navigator {
     /// # Example
     ///
     /// ```ignore
-    /// use gpui-navigator::{Navigator, RouteParams};
+    /// use gpui_navigator::{Navigator, RouteParams};
     ///
     /// let mut params = RouteParams::new();
     /// params.set("id".into(), "123".into());
@@ -614,7 +614,7 @@ impl Navigator {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{Navigator, Transition};
+    /// use gpui_navigator::{Navigator, Transition};
     ///
     /// Navigator::set_next_transition(cx, Transition::fade(300));
     /// Navigator::push(cx, "/page");
@@ -630,7 +630,7 @@ impl Navigator {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{Navigator, Transition};
+    /// use gpui_navigator::{Navigator, Transition};
     ///
     /// Navigator::push_with_transition(cx, "/page", Transition::slide_left(300));
     /// ```
@@ -650,7 +650,7 @@ impl Navigator {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{Navigator, Transition};
+    /// use gpui_navigator::{Navigator, Transition};
     ///
     /// Navigator::replace_with_transition(cx, "/page", Transition::fade(200));
     /// ```
@@ -670,7 +670,7 @@ impl Navigator {
     ///
     /// # Example
     /// ```ignore
-    /// use gpui-navigator::{Navigator, RouteParams, Transition};
+    /// use gpui_navigator::{Navigator, RouteParams, Transition};
     ///
     /// let mut params = RouteParams::new();
     /// params.set("id".to_string(), "123".to_string());

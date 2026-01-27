@@ -7,7 +7,7 @@
 //! # Example
 //!
 //! ```no_run
-//! use gpui-navigator::{RouteMiddleware, NavigationRequest};
+//! use gpui_navigator::{RouteMiddleware, NavigationRequest};
 //! use std::future::Future;
 //! use std::pin::Pin;
 //!
@@ -46,7 +46,7 @@ use std::future::Future;
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{RouteMiddleware, NavigationRequest};
+/// use gpui_navigator::{RouteMiddleware, NavigationRequest};
 /// use std::future::Future;
 /// use std::pin::Pin;
 ///
@@ -127,7 +127,7 @@ pub trait RouteMiddleware: Send + Sync + 'static {
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::middleware_fn;
+/// use gpui_navigator::middleware_fn;
 ///
 /// let middleware = middleware_fn(
 ///     |_cx, request| {

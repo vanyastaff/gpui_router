@@ -150,7 +150,7 @@ fn find_index_route(children: &[Arc<Route>], params: RouteParams) -> Option<Reso
 /// # Example
 ///
 /// ```
-/// use gpui-navigator::build_child_path;
+/// use gpui_navigator::build_child_path;
 ///
 /// let full_path = build_child_path("/dashboard", "settings");
 /// assert_eq!(full_path, "/dashboard/settings");

@@ -489,10 +489,10 @@ mod tests {
     fn test_resolve_dashboard_analytics() {
         // Create dashboard route with analytics child
         let dashboard = Arc::new(
-            Route::new("dashboard", |_cx, _params| {
+            Route::new("dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
-            .children(vec![Arc::new(Route::new("analytics", |_cx, _params| {
+            .children(vec![Arc::new(Route::new("analytics", |_, _cx, _params| {
                 div().child("Analytics").into_any_element()
             }))]),
         );
@@ -541,14 +541,14 @@ mod tests {
     fn test_resolve_simple_child() {
         // Create parent route with children
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
             .children(vec![
-                Arc::new(Route::new("overview", |_cx, _params| {
+                Arc::new(Route::new("overview", |_, _cx, _params| {
                     div().child("Overview").into_any_element()
                 })),
-                Arc::new(Route::new("settings", |_cx, _params| {
+                Arc::new(Route::new("settings", |_, _cx, _params| {
                     div().child("Settings").into_any_element()
                 })),
             ]),
@@ -566,10 +566,10 @@ mod tests {
     fn test_resolve_index_route() {
         // Create parent with index route
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
-            .children(vec![Arc::new(Route::new("", |_cx, _params| {
+            .children(vec![Arc::new(Route::new("", |_, _cx, _params| {
                 div().child("Index").into_any_element()
             }))]),
         );
@@ -585,10 +585,10 @@ mod tests {
     #[test]
     fn test_no_matching_child() {
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
-            .children(vec![Arc::new(Route::new("overview", |_cx, _params| {
+            .children(vec![Arc::new(Route::new("overview", |_, _cx, _params| {
                 div().child("Overview").into_any_element()
             }))]),
         );
@@ -604,12 +604,12 @@ mod tests {
     fn test_named_outlet_resolution() {
         // Create parent with named outlet
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
             .children(vec![
                 // Default outlet children
-                Arc::new(Route::new("main", |_cx, _params| {
+                Arc::new(Route::new("main", |_, _cx, _params| {
                     div().child("Main Content").into_any_element()
                 })),
             ])
@@ -617,7 +617,7 @@ mod tests {
                 "sidebar",
                 vec![
                     // Sidebar outlet children
-                    Arc::new(Route::new("main", |_cx, _params| {
+                    Arc::new(Route::new("main", |_, _cx, _params| {
                         div().child("Sidebar Content").into_any_element()
                     })),
                 ],
@@ -643,10 +643,10 @@ mod tests {
     #[test]
     fn test_named_outlet_not_found() {
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
-            .children(vec![Arc::new(Route::new("main", |_cx, _params| {
+            .children(vec![Arc::new(Route::new("main", |_, _cx, _params| {
                 div().child("Main").into_any_element()
             }))]),
         );
@@ -664,19 +664,19 @@ mod tests {
     #[test]
     fn test_multiple_named_outlets() {
         let parent = Arc::new(
-            Route::new("/app", |_cx, _params| div().child("App").into_any_element())
-                .children(vec![Arc::new(Route::new("page", |_cx, _params| {
+            Route::new("/app", |_, _cx, _params| div().child("App").into_any_element())
+                .children(vec![Arc::new(Route::new("page", |_, _cx, _params| {
                     div().child("Main Page").into_any_element()
                 }))])
                 .named_outlet(
                     "sidebar",
-                    vec![Arc::new(Route::new("page", |_cx, _params| {
+                    vec![Arc::new(Route::new("page", |_, _cx, _params| {
                         div().child("Sidebar").into_any_element()
                     }))],
                 )
                 .named_outlet(
                     "footer",
-                    vec![Arc::new(Route::new("page", |_cx, _params| {
+                    vec![Arc::new(Route::new("page", |_, _cx, _params| {
                         div().child("Footer").into_any_element()
                     }))],
                 ),
@@ -698,15 +698,15 @@ mod tests {
     #[test]
     fn test_named_outlet_with_index_route() {
         let parent = Arc::new(
-            Route::new("/dashboard", |_cx, _params| {
+            Route::new("/dashboard", |_, _cx, _params| {
                 div().child("Dashboard").into_any_element()
             })
-            .children(vec![Arc::new(Route::new("", |_cx, _params| {
+            .children(vec![Arc::new(Route::new("", |_, _cx, _params| {
                 div().child("Main Index").into_any_element()
             }))])
             .named_outlet(
                 "sidebar",
-                vec![Arc::new(Route::new("", |_cx, _params| {
+                vec![Arc::new(Route::new("", |_, _cx, _params| {
                     div().child("Sidebar Index").into_any_element()
                 }))],
             ),
@@ -757,12 +757,12 @@ pub type ResolvedChildRoute = (Arc<Route>, RouteParams);
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{Route, RouteParams, resolve_child_route};
+/// use gpui_navigator::{Route, RouteParams, resolve_child_route};
 ///
-/// let parent = Route::new("/dashboard", |_cx, _params| gpui::div().into_any_element())
+/// let parent = Route::new("/dashboard", |_, _cx, _params| gpui::div().into_any_element())
 ///     .children(vec![
-///         Route::new("overview", |_cx, _params| gpui::div().into_any_element()),
-///         Route::new("settings", |_cx, _params| gpui::div().into_any_element()),
+///         Route::new("overview", |_, _cx, _params| gpui::div().into_any_element()),
+///         Route::new("settings", |_, _cx, _params| gpui::div().into_any_element()),
 ///     ]);
 ///
 /// // When navigating to "/dashboard/settings"
@@ -910,7 +910,7 @@ fn find_index_route(children: &[Arc<Route>], params: RouteParams) -> Option<Reso
 /// # Example
 ///
 /// ```
-/// use gpui-navigator::build_child_path;
+/// use gpui_navigator::build_child_path;
 ///
 /// let full_path = build_child_path("/dashboard", "settings");
 /// assert_eq!(full_path, "/dashboard/settings");

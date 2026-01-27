@@ -12,7 +12,7 @@
 //! # Usage
 //!
 //! ```ignore
-//! use gpui-navigator::{trace_log, debug_log, info_log};
+//! use gpui_navigator::{trace_log, debug_log, info_log};
 //!
 //! trace_log!("Entering function");
 //! debug_log!("Navigating to route: {}", path);

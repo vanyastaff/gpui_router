@@ -14,7 +14,7 @@
 //!
 //! ```ignore
 //! use gpui::*;
-//! use gpui-navigator::*;
+//! use gpui_navigator::*;
 //!
 //! fn main() {
 //!     Application::new().run(|cx| {
@@ -49,7 +49,7 @@
 //! The library provides a simple navigation API:
 //!
 //! ```ignore
-//! use gpui-navigator::Navigator;
+//! use gpui_navigator::Navigator;
 //!
 //! // Push new route
 //! Navigator::push(cx, "/profile");
@@ -69,13 +69,13 @@
 //! Protect routes with authentication and authorization:
 //!
 //! ```no_run
-//! use gpui-navigator::*;
+//! use gpui_navigator::*;
 //!
 //! Route::new("/admin", admin_page)
 //!     .guard(AuthGuard::new(is_logged_in, "/login"))
 //!     .guard(RoleGuard::new(get_user_role, "admin", Some("/forbidden")))
 //! # ;
-//! # fn admin_page(_: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
+//! # fn admin_page(_: &mut gpui::Window, _: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
 //! # fn is_logged_in(_: &gpui::App) -> bool { todo!() }
 //! # fn get_user_role(_: &gpui::App) -> Option<String> { todo!() }
 //! ```
@@ -85,7 +85,7 @@
 //! Create hierarchical route structures:
 //!
 //! ```no_run
-//! use gpui-navigator::*;
+//! use gpui_navigator::*;
 //!
 //! Route::new("/dashboard", dashboard_layout)
 //!     .children(vec![
@@ -93,9 +93,9 @@
 //!         Route::new("settings", settings_page).into(),
 //!     ])
 //! # ;
-//! # fn dashboard_layout(_: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
-//! # fn overview_page(_: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
-//! # fn settings_page(_: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
+//! # fn dashboard_layout(_: &mut gpui::Window, _: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
+//! # fn overview_page(_: &mut gpui::Window, _: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
+//! # fn settings_page(_: &mut gpui::Window, _: &mut gpui::App, _: &RouteParams) -> gpui::AnyElement { todo!() }
 //! ```
 //!
 //! # Feature Flags
@@ -103,7 +103,7 @@
 //! - `log` (default) - Uses the standard `log` crate for logging
 //! - `tracing` - Uses the `tracing` crate for structured logging (mutually exclusive with `log`)
 
-#![doc(html_root_url = "https://docs.rs/gpui-navigator/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/gpui_navigator/0.1.0")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 // Lints are configured in Cargo.toml [lints] section
 
@@ -183,7 +183,7 @@ use std::collections::HashMap;
 /// # Example
 ///
 /// ```
-/// use gpui-navigator::RouteMatch;
+/// use gpui_navigator::RouteMatch;
 ///
 /// let route_match = RouteMatch::new("/users/123".to_string())
 ///     .with_param("id".to_string(), "123".to_string());

@@ -1,10 +1,10 @@
-//! Integration tests for gpui-navigator
+//! Integration tests for gpui_navigator
 //!
 //! These tests verify the complete router workflow including initialization,
 //! navigation, guards, and route matching.
 
 use gpui::{div, IntoElement, ParentElement, TestAppContext};
-use gpui-navigator::*;
+use gpui_navigator::*;
 
 // ============================================================================
 // Router Initialization Tests
@@ -14,10 +14,10 @@ use gpui-navigator::*;
 async fn test_router_initialization(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/", |_, _| {
+            router.add_route(Route::new("/", |_, _, _| {
                 div().child("Home").into_any_element()
             }));
-            router.add_route(Route::new("/about", |_, _| {
+            router.add_route(Route::new("/about", |_, _, _| {
                 div().child("About").into_any_element()
             }));
         });
@@ -32,7 +32,7 @@ async fn test_router_with_named_routes(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
             router.add_route(
-                Route::new("/users/:id", |_, params| {
+                Route::new("/users/:id", |_, _, params| {
                     let id = params.get("id").cloned().unwrap_or_default();
                     div().child(format!("User {}", id)).into_any_element()
                 })
@@ -57,9 +57,9 @@ async fn test_router_with_named_routes(cx: &mut TestAppContext) {
 async fn test_push_navigation(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/page1", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/page2", |_, _| div().into_any_element()));
+            router.add_route(Route::new("/", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/page1", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/page2", |_, _, _| div().into_any_element()));
         });
     });
 
@@ -79,8 +79,8 @@ async fn test_push_navigation(cx: &mut TestAppContext) {
 async fn test_pop_navigation(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/page1", |_, _| div().into_any_element()));
+            router.add_route(Route::new("/", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/page1", |_, _, _| div().into_any_element()));
         });
     });
 
@@ -99,9 +99,9 @@ async fn test_pop_navigation(cx: &mut TestAppContext) {
 async fn test_replace_navigation(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/login", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/dashboard", |_, _| div().into_any_element()));
+            router.add_route(Route::new("/", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/login", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/dashboard", |_, _, _| div().into_any_element()));
         });
     });
 
@@ -120,8 +120,8 @@ async fn test_replace_navigation(cx: &mut TestAppContext) {
 async fn test_forward_navigation(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/", |_, _| div().into_any_element()));
-            router.add_route(Route::new("/page1", |_, _| div().into_any_element()));
+            router.add_route(Route::new("/", |_, _, _| div().into_any_element()));
+            router.add_route(Route::new("/page1", |_, _, _| div().into_any_element()));
         });
     });
 
@@ -143,7 +143,7 @@ async fn test_forward_navigation(cx: &mut TestAppContext) {
 async fn test_route_params_extraction(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/users/:id", |_, params| {
+            router.add_route(Route::new("/users/:id", |_, _, params| {
                 let id = params.get("id").cloned().unwrap_or_default();
                 div().child(format!("User: {}", id)).into_any_element()
             }));
@@ -364,7 +364,7 @@ fn test_navigation_result_variants() {
 
 #[test]
 fn test_history_operations() {
-    use gpui-navigator::history::History;
+    use gpui_navigator::history::History;
 
     let mut history = History::new("/".to_string());
 
@@ -387,7 +387,7 @@ fn test_history_operations() {
 
 #[test]
 fn test_history_truncation() {
-    use gpui-navigator::history::History;
+    use gpui_navigator::history::History;
 
     let mut history = History::new("/".to_string());
     history.push("/page1".to_string());
@@ -410,7 +410,7 @@ fn test_history_truncation() {
 async fn test_static_route_matching(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/about", |_, _| {
+            router.add_route(Route::new("/about", |_, _, _| {
                 div().child("About").into_any_element()
             }));
         });
@@ -424,7 +424,7 @@ async fn test_static_route_matching(cx: &mut TestAppContext) {
 async fn test_dynamic_route_matching(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
-            router.add_route(Route::new("/posts/:id", |_, _| {
+            router.add_route(Route::new("/posts/:id", |_, _, _| {
                 div().child("Post").into_any_element()
             }));
         });
@@ -471,7 +471,7 @@ fn test_route_cache_stats() {
     assert_eq!(cache.stats().parent_misses, 1);
 
     // Set and hit
-    cache.set_parent("/test".to_string(), gpui-navigator::RouteId::from_path("/"));
+    cache.set_parent("/test".to_string(), gpui_navigator::RouteId::from_path("/"));
     cache.get_parent("/test");
     assert_eq!(cache.stats().parent_hits, 1);
 
@@ -500,7 +500,7 @@ async fn test_not_found_handler_rendering(cx: &mut TestAppContext) {
 
 #[gpui::test]
 async fn test_error_handler_rendering(cx: &mut TestAppContext) {
-    use gpui-navigator::NavigationError;
+    use gpui_navigator::NavigationError;
 
     let handlers = ErrorHandlers::new()
         .on_not_found(|_cx, path| {
@@ -528,7 +528,7 @@ async fn test_error_handler_rendering(cx: &mut TestAppContext) {
 
 #[gpui::test]
 async fn test_custom_error_pages(cx: &mut TestAppContext) {
-    use gpui-navigator::NavigationError;
+    use gpui_navigator::NavigationError;
 
     let handlers = ErrorHandlers::new()
         .on_not_found(|_cx, path| {
@@ -567,19 +567,19 @@ async fn test_full_navigation_flow(cx: &mut TestAppContext) {
     cx.update(|cx| {
         init_router(cx, |router| {
             router.add_route(
-                Route::new("/", |_, _| div().child("Home").into_any_element())
+                Route::new("/", |_, _, _| div().child("Home").into_any_element())
                     .name("home")
                     .transition(Transition::None),
             );
             router.add_route(
-                Route::new("/users", |_, _| {
+                Route::new("/users", |_, _, _| {
                     div().child("Users List").into_any_element()
                 })
                 .name("users")
                 .transition(Transition::fade(200)),
             );
             router.add_route(
-                Route::new("/users/:id", |_, params| {
+                Route::new("/users/:id", |_, _, params| {
                     let id = params.get("id").cloned().unwrap_or_default();
                     div().child(format!("User {}", id)).into_any_element()
                 })

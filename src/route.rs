@@ -9,7 +9,7 @@ use crate::params::RouteParams;
 #[cfg(feature = "transition")]
 use crate::transition::TransitionConfig;
 use crate::RouteMatch;
-use gpui::{AnyElement, App, IntoElement};
+use gpui::{AnyElement, App, IntoElement, Window};
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -247,12 +247,17 @@ impl RouteConfig {
 
 /// Type for route builder function
 ///
-/// Builder receives context and parameters, returns an AnyElement.
+/// Builder receives Window, context and parameters, returns an AnyElement.
 /// Through context you have access to App, global state, and Navigator.
+///
+/// The `Window` parameter allows builders to use stateful GPUI features like
+/// `window.use_state()` or `window.use_keyed_state()` for caching expensive computations
+/// or creating persistent entities across renders.
 ///
 /// Note: When using `Route::new()`, your builder can return any type that implements
 /// `IntoElement` - the conversion to `AnyElement` is done automatically.
-pub type RouteBuilder = Arc<dyn Fn(&mut App, &RouteParams) -> AnyElement + Send + Sync>;
+pub type RouteBuilder =
+    Arc<dyn Fn(&mut Window, &mut App, &RouteParams) -> AnyElement + Send + Sync>;
 
 /// Shared route handle.
 ///
@@ -290,7 +295,7 @@ impl Route {
     /// Create a route with a builder function
     ///
     /// Routes are registered with a path pattern and a builder function that
-    /// creates the view. The builder receives the app context and extracted
+    /// creates the view. The builder receives the window, app context and extracted
     /// route parameters.
     ///
     /// # Example
@@ -300,12 +305,12 @@ impl Route {
     /// use gpui::*;
     ///
     /// // Simple static route
-    /// Route::new("/home", |cx, params| {
+    /// Route::new("/home", |window, cx, params| {
     ///     div().child("Home Page")
     /// });
     ///
     /// // Route with dynamic parameter
-    /// Route::new("/users/:id", |cx, params| {
+    /// Route::new("/users/:id", |window, cx, params| {
     ///     let id = params.get("id").unwrap();
     ///     div().child(format!("User: {}", id))
     /// });
@@ -313,12 +318,12 @@ impl Route {
     pub fn new<F, E>(path: impl Into<String>, builder: F) -> Self
     where
         E: IntoElement,
-        F: Fn(&mut App, &RouteParams) -> E + Send + Sync + 'static,
+        F: Fn(&mut Window, &mut App, &RouteParams) -> E + Send + Sync + 'static,
     {
         Self {
             config: RouteConfig::new(path),
-            builder: Some(Arc::new(move |cx, params| {
-                builder(cx, params).into_any_element()
+            builder: Some(Arc::new(move |window, cx, params| {
+                builder(window, cx, params).into_any_element()
             })),
             children: Vec::new(),
             named_children: HashMap::new(),
@@ -594,8 +599,13 @@ impl Route {
     }
 
     /// Build the view for this route
-    pub fn build(&self, cx: &mut App, params: &RouteParams) -> Option<AnyElement> {
-        self.builder.as_ref().map(|b| b(cx, params))
+    pub fn build(
+        &self,
+        window: &mut Window,
+        cx: &mut App,
+        params: &RouteParams,
+    ) -> Option<AnyElement> {
+        self.builder.as_ref().map(|b| b(window, cx, params))
     }
 
     /// Find a child route by path segment
@@ -698,7 +708,7 @@ pub trait IntoRoute {
 }
 
 /// Type for route builder function
-pub type BuilderFn = Arc<dyn Fn(&mut App, &RouteParams) -> AnyElement + Send + Sync>;
+pub type BuilderFn = Arc<dyn Fn(&mut Window, &mut App, &RouteParams) -> AnyElement + Send + Sync>;
 
 /// A route descriptor containing path, parameters, and optional builder
 pub struct RouteDescriptor {
@@ -784,13 +794,13 @@ impl PageRoute {
     pub fn builder<F, E>(path: impl Into<String>, builder: F) -> Self
     where
         E: IntoElement,
-        F: Fn(&mut App, &RouteParams) -> E + Send + Sync + 'static,
+        F: Fn(&mut Window, &mut App, &RouteParams) -> E + Send + Sync + 'static,
     {
         Self {
             path: path.into(),
             params: RouteParams::new(),
-            builder: Some(Arc::new(move |cx, params| {
-                builder(cx, params).into_any_element()
+            builder: Some(Arc::new(move |window, cx, params| {
+                builder(window, cx, params).into_any_element()
             })),
         }
     }
@@ -802,10 +812,10 @@ impl PageRoute {
     pub fn with_builder<F, E>(mut self, builder: F) -> Self
     where
         E: IntoElement,
-        F: Fn(&mut App, &RouteParams) -> E + Send + Sync + 'static,
+        F: Fn(&mut Window, &mut App, &RouteParams) -> E + Send + Sync + 'static,
     {
-        self.builder = Some(Arc::new(move |cx, params| {
-            builder(cx, params).into_any_element()
+        self.builder = Some(Arc::new(move |window, cx, params| {
+            builder(window, cx, params).into_any_element()
         }));
         self
     }

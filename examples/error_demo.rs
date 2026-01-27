@@ -4,7 +4,7 @@
 
 use gpui::prelude::*;
 use gpui::*;
-use gpui-navigator::*;
+use gpui_navigator::*;
 
 fn main() {
     env_logger::init();
@@ -13,15 +13,15 @@ fn main() {
         // Initialize router
         init_router(cx, |router| {
             router.add_route(
-                Route::new("/", |_, _| home_page().into_any_element())
+                Route::new("/", |_, _, _| home_page().into_any_element())
                     .transition(Transition::fade(200)),
             );
             router.add_route(
-                Route::new("/about", |_, _| about_page().into_any_element())
+                Route::new("/about", |_, _, _| about_page().into_any_element())
                     .transition(Transition::slide_left(300)),
             );
             router.add_route(
-                Route::new("/users/:id", |_, params| {
+                Route::new("/users/:id", |_, _, params| {
                     user_page(params).into_any_element()
                 })
                 .transition(Transition::slide_right(300)),

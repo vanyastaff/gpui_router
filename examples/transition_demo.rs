@@ -2,7 +2,7 @@
 
 use gpui::prelude::*;
 use gpui::*;
-use gpui-navigator::*;
+use gpui_navigator::*;
 
 fn main() {
     env_logger::init();
@@ -12,39 +12,45 @@ fn main() {
         // Initialize router with routes
         init_router(cx, |router| {
             router.add_route(
-                Route::new("/", |_, _| home_page().into_any_element())
+                Route::new("/", |_, _, _| home_page().into_any_element())
                     .name("home")
                     .transition(Transition::None),
             );
 
             router.add_route(
-                Route::new("/fade", |_, _| fade_page().into_any_element())
+                Route::new("/fade", |_, _, _| fade_page().into_any_element())
                     .name("fade")
                     .transition(Transition::fade(1000)), // 1 секунда
             );
 
             router.add_route(
-                Route::new("/slide-left", |_, _| slide_left_page().into_any_element())
-                    .name("slide-left")
-                    .transition(Transition::slide_left(1000)), // 1 секунда
+                Route::new("/slide-left", |_, _, _| {
+                    slide_left_page().into_any_element()
+                })
+                .name("slide-left")
+                .transition(Transition::slide_left(1000)), // 1 секунда
             );
 
             router.add_route(
-                Route::new("/slide-right", |_, _| slide_right_page().into_any_element())
-                    .name("slide-right")
-                    .transition(Transition::slide_right(1000)), // 1 секунда
+                Route::new("/slide-right", |_, _, _| {
+                    slide_right_page().into_any_element()
+                })
+                .name("slide-right")
+                .transition(Transition::slide_right(1000)), // 1 секунда
             );
 
             router.add_route(
-                Route::new("/slide-up", |_, _| slide_up_page().into_any_element())
+                Route::new("/slide-up", |_, _, _| slide_up_page().into_any_element())
                     .name("slide-up")
                     .transition(Transition::slide_up(1000)), // 1 секунда
             );
 
             router.add_route(
-                Route::new("/slide-down", |_, _| slide_down_page().into_any_element())
-                    .name("slide-down")
-                    .transition(Transition::slide_down(1000)), // 1 секунда
+                Route::new("/slide-down", |_, _, _| {
+                    slide_down_page().into_any_element()
+                })
+                .name("slide-down")
+                .transition(Transition::slide_down(1000)), // 1 секунда
             );
         });
 

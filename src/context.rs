@@ -335,8 +335,8 @@ impl UseRouter for App {
 /// fn main() {
 ///     App::new().run(|cx| {
 ///         init_router(cx, |router| {
-///             router.add_route(Route::new("/", |_cx, _params| gpui::div().into_any_element()));
-///             router.add_route(Route::new("/users/:id", |_cx, _params| gpui::div().into_any_element()));
+///             router.add_route(Route::new("/", |_, _cx, _params| gpui::div().into_any_element()));
+///             router.add_route(Route::new("/users/:id", |_, _cx, _params| gpui::div().into_any_element()));
 ///         });
 ///     });
 /// }
@@ -390,7 +390,7 @@ impl<C: BorrowAppContext> NavigatorHandle<'_, C> {
     /// Navigator::of(cx).push("/users");
     ///
     /// // With PageRoute
-    /// Navigator::of(cx).push(PageRoute::builder("/users/:id", |_cx, _params| gpui::div())
+    /// Navigator::of(cx).push(PageRoute::builder("/users/:id", |_, _cx, _params| gpui::div())
     ///     .with_param("id".into(), "123".into()));
     /// ```
     pub fn push(self, route: impl IntoRoute) -> Self {
@@ -482,7 +482,7 @@ impl Navigator {
     /// Navigator::push(cx, "/users/123");
     ///
     /// // With PageRoute and params
-    /// Navigator::push(cx, PageRoute::builder("/profile", |_cx, _params| gpui::div())
+    /// Navigator::push(cx, PageRoute::builder("/profile", |_, _cx, _params| gpui::div())
     ///     .with_param("userId".into(), "456".into()));
     /// ```
     pub fn push(cx: &mut impl BorrowAppContext, route: impl IntoRoute) {
@@ -503,7 +503,7 @@ impl Navigator {
     /// Navigator::replace(cx, "/login");
     ///
     /// // With PageRoute
-    /// Navigator::replace(cx, PageRoute::builder("/login", |_cx, _params| gpui::div())
+    /// Navigator::replace(cx, PageRoute::builder("/login", |_, _cx, _params| gpui::div())
     ///     .with_param("redirect".into(), "/dashboard".into()));
     /// ```
     pub fn replace(cx: &mut impl BorrowAppContext, route: impl IntoRoute) {
@@ -705,13 +705,13 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/users", |_cx, _params| {
+                router.add_route(Route::new("/users", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/users/:id", |_cx, _params| {
+                router.add_route(Route::new("/users/:id", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -743,13 +743,13 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/page1", |_cx, _params| {
+                router.add_route(Route::new("/page1", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/page2", |_cx, _params| {
+                router.add_route(Route::new("/page2", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -787,13 +787,13 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/login", |_cx, _params| {
+                router.add_route(Route::new("/login", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/home", |_cx, _params| {
+                router.add_route(Route::new("/home", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -820,7 +820,7 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -849,16 +849,16 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/step1", |_cx, _params| {
+                router.add_route(Route::new("/step1", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/step2", |_cx, _params| {
+                router.add_route(Route::new("/step2", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/step3", |_cx, _params| {
+                router.add_route(Route::new("/step3", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -895,15 +895,15 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/users/:id", |_cx, _params| {
+                router.add_route(Route::new("/users/:id", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
                 router.add_route(Route::new(
                     "/posts/:id/comments/:commentId",
-                    |_cx, _params| gpui::div().into_any_element(),
+                    |_, _cx, _params| gpui::div().into_any_element(),
                 ));
             });
         });
@@ -927,13 +927,13 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/home", |_cx, _params| {
+                router.add_route(Route::new("/home", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/profile", |_cx, _params| {
+                router.add_route(Route::new("/profile", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -981,10 +981,10 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/users/:id", |_cx, _params| {
+                router.add_route(Route::new("/users/:id", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -994,8 +994,10 @@ mod tests {
         cx.update(|cx| {
             Navigator::push(
                 cx,
-                PageRoute::builder("/users/:id", |_cx, _params| gpui::div().into_any_element())
-                    .with_param("id", "123"),
+                PageRoute::builder("/users/:id", |_, _cx, _params| {
+                    gpui::div().into_any_element()
+                })
+                .with_param("id", "123"),
             );
         });
 
@@ -1004,8 +1006,10 @@ mod tests {
         // Test with Navigator.of() style
         cx.update(|cx| {
             Navigator::of(cx).push(
-                PageRoute::builder("/users/:id", |_cx, _params| gpui::div().into_any_element())
-                    .with_param("id", "456"),
+                PageRoute::builder("/users/:id", |_, _cx, _params| {
+                    gpui::div().into_any_element()
+                })
+                .with_param("id", "456"),
             );
         });
 
@@ -1017,10 +1021,10 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/home", |_cx, _params| {
+                router.add_route(Route::new("/home", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });
@@ -1054,13 +1058,13 @@ mod tests {
         // Initialize router
         cx.update(|cx| {
             init_router(cx, |router| {
-                router.add_route(Route::new("/", |_cx, _params| {
+                router.add_route(Route::new("/", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/page1", |_cx, _params| {
+                router.add_route(Route::new("/page1", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
-                router.add_route(Route::new("/page2", |_cx, _params| {
+                router.add_route(Route::new("/page2", |_, _cx, _params| {
                     gpui::div().into_any_element()
                 }));
             });

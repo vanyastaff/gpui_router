@@ -307,14 +307,14 @@ impl Render for RouterOutlet {
             // Build OLD and NEW content ONCE before match to avoid multiple builder() calls per render
             let old_content_opt = previous_route.map(|prev| {
                 if let Some(builder) = prev.builder.as_ref() {
-                    builder(cx, &prev.params)
+                    builder(window, cx, &prev.params)
                 } else {
                     not_found_page().into_any_element()
                 }
             });
 
             let new_content = if let Some(builder) = builder_opt.as_ref() {
-                builder(cx, &route_params)
+                builder(window, cx, &route_params)
             } else {
                 not_found_page().into_any_element()
             };
@@ -524,40 +524,62 @@ impl Render for RouterOutlet {
 
 /// Convenience function to create a default router outlet
 ///
+/// **DEPRECATED**: This function is deprecated. Use `RouterOutlet` entity instead.
+///
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{router_outlet, RouteParams};
+/// use gpui-navigator::{RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
-/// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
-///     div()
-///         .child("App Layout")
-///         .child(router_outlet(cx)) // Child routes render here
-///         .into_any_element()
+/// struct Layout {
+///     outlet: Entity<RouterOutlet>,
+/// }
+///
+/// impl Layout {
+///     fn new(cx: &mut Context<'_, Self>) -> Self {
+///         Self {
+///             outlet: cx.new(|_| RouterOutlet::new()),
+///         }
+///     }
 /// }
 /// ```
-pub fn router_outlet(cx: &mut App) -> impl IntoElement {
-    render_router_outlet(cx, None)
+#[deprecated(since = "0.1.3", note = "Use RouterOutlet entity instead")]
+pub fn router_outlet(window: &mut Window, cx: &mut App) -> impl IntoElement {
+    render_router_outlet(window, cx, None)
 }
 
 /// Convenience function to create a named router outlet
 ///
+/// **DEPRECATED**: This function is deprecated. Use `RouterOutlet::named()` entity instead.
+///
 /// # Example
 ///
 /// ```ignore
-/// use gpui-navigator::{router_outlet, router_outlet_named, RouteParams};
+/// use gpui-navigator::{RouterOutlet, RouteParams};
 /// use gpui::*;
 ///
-/// fn layout(cx: &mut App, _params: &RouteParams) -> AnyElement {
-///     div()
-///         .child(router_outlet(cx)) // Main content
-///         .child(router_outlet_named(cx, "sidebar")) // Sidebar
-///         .into_any_element()
+/// struct Layout {
+///     main_outlet: Entity<RouterOutlet>,
+///     sidebar_outlet: Entity<RouterOutlet>,
+/// }
+///
+/// impl Layout {
+///     fn new(cx: &mut Context<'_, Self>) -> Self {
+///         Self {
+///             main_outlet: cx.new(|_| RouterOutlet::new()),
+///             sidebar_outlet: cx.new(|_| RouterOutlet::named("sidebar")),
+///         }
+///     }
 /// }
 /// ```
-pub fn router_outlet_named(cx: &mut App, name: impl Into<String>) -> impl IntoElement {
-    render_router_outlet(cx, Some(&name.into()))
+#[deprecated(since = "0.1.3", note = "Use RouterOutlet::named() entity instead")]
+pub fn router_outlet_named(
+    window: &mut Window,
+    cx: &mut App,
+    name: impl Into<String>,
+) -> impl IntoElement {
+    render_router_outlet(window, cx, Some(&name.into()))
 }
 
 /// RouterOutletElement - a function-based element that can access App context
@@ -578,7 +600,7 @@ pub fn router_outlet_named(cx: &mut App, name: impl Into<String>) -> impl IntoEl
 ///         .into_any_element()
 /// }
 /// ```
-pub fn render_router_outlet(cx: &mut App, name: Option<&str>) -> AnyElement {
+pub fn render_router_outlet(window: &mut Window, cx: &mut App, name: Option<&str>) -> AnyElement {
     trace_log!("render_router_outlet called with name: {:?}", name);
 
     // Access GlobalRouter
@@ -647,8 +669,8 @@ pub fn render_router_outlet(cx: &mut App, name: Option<&str>) -> AnyElement {
 
     // Render the child route
     if let Some(builder) = &child_route.builder {
-        // Call the builder with cx and parameters
-        builder(cx, &child_params)
+        // Call the builder with window, cx and parameters
+        builder(window, cx, &child_params)
     } else {
         div()
             .child(format!(
@@ -1218,7 +1240,11 @@ mod tests {
     }
 
     // Helper to create a dummy builder
-    fn dummy_builder(_cx: &mut gpui::App, _params: &crate::RouteParams) -> gpui::AnyElement {
+    fn dummy_builder(
+        _window: &mut gpui::Window,
+        _cx: &mut gpui::App,
+        _params: &crate::RouteParams,
+    ) -> gpui::AnyElement {
         div().child("test").into_any_element()
     }
 

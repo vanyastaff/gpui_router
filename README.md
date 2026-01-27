@@ -45,14 +45,14 @@ fn main() {
     Application::new().run(|cx: &mut App| {
         // Initialize router
         init_router(cx, |router| {
-            // Define routes with closures
+            // Define routes - simple and ergonomic!
             router.add_route(
-                Route::new("/", |_, _| home_page().into_any_element())
+                Route::view("/", || home_page().into_any_element())
                     .transition(Transition::fade(300))
             );
             
             router.add_route(
-                Route::new("/about", |_, _| about_page().into_any_element())
+                Route::view("/about", || about_page().into_any_element())
                     .transition(Transition::slide_left(400))
             );
         });
@@ -93,6 +93,101 @@ impl Render for AppView {
             .child(self.outlet.clone())
     }
 }
+```
+
+## Route Builders
+
+GPUI Navigator provides three ergonomic methods for defining routes:
+
+### `Route::view()` - Stateless Pages
+
+For simple pages that don't need state or parameters:
+
+```rust
+Route::view("/about", || {
+    div().child("About Page").into_any_element()
+})
+```
+
+### `Route::component()` - Stateful Pages
+
+For pages with internal state that persists across navigation. The component is automatically cached using `window.use_keyed_state()`:
+
+```rust
+use gpui::*;
+use gpui_navigator::*;
+
+struct CounterPage {
+    count: i32,
+}
+
+impl CounterPage {
+    fn new() -> Self {
+        Self { count: 0 }
+    }
+}
+
+impl Render for CounterPage {
+    fn render(&mut self, _: &mut Window, cx: &mut Context<'_, Self>) -> impl IntoElement {
+        div()
+            .child(format!("Count: {}", self.count))
+            .child(
+                div()
+                    .on_mouse_down(MouseButton::Left, cx.listener(|page, _, _, cx| {
+                        page.count += 1;
+                        cx.notify();
+                    }))
+                    .child("Increment")
+            )
+    }
+}
+
+// Route definition - component state persists across navigation!
+Route::component("/counter", CounterPage::new)
+```
+
+**Benefits:**
+- ✅ State persists when navigating away and back
+- ✅ Automatic Entity caching
+- ✅ Clean, concise API
+
+### `Route::component_with_params()` - Stateful Pages with Route Params
+
+For pages that need route parameters and maintain state:
+
+```rust
+struct UserPage {
+    user_id: String,
+}
+
+impl UserPage {
+    fn new(user_id: String) -> Self {
+        Self { user_id }
+    }
+}
+
+impl Render for UserPage {
+    fn render(&mut self, _: &mut Window, _: &mut Context<'_, Self>) -> impl IntoElement {
+        div().child(format!("User: {}", self.user_id))
+    }
+}
+
+// Each unique user_id gets its own cached component instance
+Route::component_with_params("/user/:id", |params| {
+    let id = params.get("id").unwrap().to_string();
+    UserPage::new(id)
+})
+```
+
+### `Route::new()` - Full Control
+
+For advanced use cases when you need full control over the builder function:
+
+```rust
+Route::new("/advanced", |window, cx, params| {
+    // Full access to Window, App context, and route params
+    custom_page(window, cx, params).into_any_element()
+})
 ```
 
 ## Navigation
